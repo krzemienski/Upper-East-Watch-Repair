@@ -57,7 +57,21 @@ function inline(text: string): string {
   let out = text;
   // links [text](url)
   out = out.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_m, label, url) => {
-    const safeUrl = String(url).replace(/"/g, '&quot;');
+    const candidate = String(url).trim();
+    const isRootRelative = candidate.startsWith('/') && !candidate.startsWith('//');
+    const isAnchor = candidate.startsWith('#');
+    let isHttp = false;
+
+    try {
+      const parsed = new URL(candidate);
+      isHttp = parsed.protocol === 'https:' || parsed.protocol === 'http:';
+    } catch {
+      isHttp = false;
+    }
+
+    if (!isHttp && !isRootRelative && !isAnchor) return label;
+
+    const safeUrl = candidate.replace(/"/g, '&quot;');
     return `<a href="${safeUrl}" class="text-primary hover:underline" target="_blank" rel="noopener noreferrer">${label}</a>`;
   });
   // bold

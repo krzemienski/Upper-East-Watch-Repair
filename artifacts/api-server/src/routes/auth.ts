@@ -14,6 +14,7 @@ import {
   SESSION_TTL,
   type SessionData,
 } from '../lib/auth';
+import { isAdminUser } from '../lib/admin';
 
 const OIDC_COOKIE_TTL = 10 * 60 * 1000;
 
@@ -118,9 +119,13 @@ async function upsertUser(claims: Record<string, unknown>) {
 }
 
 router.get('/auth/user', (req: Request, res: Response) => {
+  const user = req.isAuthenticated()
+    ? { ...req.user, isAdmin: isAdminUser(req.user) }
+    : null;
+
   res.json(
     GetCurrentAuthUserResponse.parse({
-      user: req.isAuthenticated() ? req.user : null,
+      user,
     }),
   );
 });

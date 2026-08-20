@@ -12,9 +12,9 @@ import {
 import { Alert, AlertDescription, AlertTitle } from '@workspace/upper-east-horology/components/ui/alert';
 import { PageMeta } from '@/components/PageMeta';
 import { Section } from '@/components/Section';
+import { ADDRESS_SINGLE_LINE, MAPS_URL } from '@/data/business';
 
 const CAL_LINK = import.meta.env.VITE_CAL_LINK as string | undefined;
-const MAPS_URL = 'https://maps.google.com/?q=233+East+84th+Street+New+York+NY';
 
 /** Inline Cal.com embed loaded via the official embed script. */
 function CalEmbed({ calLink }: { calLink: string }) {
@@ -132,7 +132,7 @@ function CalFallback() {
               <MapPin className="h-5 w-5 text-primary mb-2" />
               <p className="font-medium text-foreground">Walk in</p>
               <p className="text-sm text-muted-foreground mt-1">
-                233 East 84th Street, New York, NY 10028
+                {ADDRESS_SINGLE_LINE}
               </p>
             </div>
           </a>

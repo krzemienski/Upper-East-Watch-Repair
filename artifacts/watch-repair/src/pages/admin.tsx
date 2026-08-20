@@ -138,7 +138,7 @@ export default function AdminPage() {
     );
   }
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || !user) {
     return (
       <>
         <PageMeta
@@ -171,7 +171,44 @@ export default function AdminPage() {
     );
   }
 
-  return <AdminEditor userName={user?.firstName ?? user?.email ?? 'Editor'} onLogout={logout} />;
+  if (!user.isAdmin) {
+    return (
+      <>
+        <PageMeta
+          title="Editor Access Required | Upper East Watch Repair"
+          description="Restricted access for the Upper East Watch Repair guide editor."
+        />
+        <div className="min-h-[70vh] flex items-center justify-center px-4 py-16">
+          <Card className="w-full max-w-md">
+            <CardHeader className="text-center">
+              <div className="mx-auto mb-4">
+                <Logo className="h-10 w-auto mx-auto" />
+              </div>
+              <div className="mx-auto mb-2 h-11 w-11 rounded-md bg-primary/10 flex items-center justify-center">
+                <ShieldAlert className="h-5 w-5 text-primary" />
+              </div>
+              <CardTitle>Editor access required</CardTitle>
+              <CardDescription>
+                You are signed in, but this Replit account is not on the shop's editor
+                allowlist.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-xs text-muted-foreground text-center">
+                Signed-in user ID: <code className="text-foreground">{user.id}</code>
+              </p>
+              <Button className="w-full" variant="outline" onClick={logout} data-testid="button-logout">
+                <LogOut className="h-4 w-4 mr-1.5" />
+                Log out
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </>
+    );
+  }
+
+  return <AdminEditor userName={user.firstName ?? user.email ?? 'Editor'} onLogout={logout} />;
 }
 
 /* ---------------- Editor ---------------- */

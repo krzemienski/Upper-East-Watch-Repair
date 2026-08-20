@@ -2,13 +2,15 @@ import { Link } from 'wouter';
 import { MapPin, Clock } from 'lucide-react';
 import { Separator } from '@workspace/upper-east-horology/components/ui/separator';
 import { Logo } from '@/components/Logo';
-
-// TODO(hours): confirm exact hours
-const HOURS = [
-  { days: 'Monday – Friday', hours: '10:00 am – 6:00 pm' },
-  { days: 'Saturday', hours: 'Closed' },
-  { days: 'Sunday', hours: '11:00 am – 5:00 pm' },
-];
+import {
+  ADDRESS_LOCALITY,
+  ADDRESS_REGION,
+  ADDRESS_SINGLE_LINE,
+  HOURS_DISPLAY,
+  MAPS_URL,
+  POSTAL_CODE,
+  STREET_ADDRESS,
+} from '@/data/business';
 
 export function SiteFooter() {
   return (
@@ -33,7 +35,7 @@ export function SiteFooter() {
               </span>
             </div>
             <ul className="space-y-2">
-              {HOURS.map((h) => (
+              {HOURS_DISPLAY.map((h) => (
                 <li key={h.days} className="flex justify-between gap-4 text-sm">
                   <span className="text-muted-foreground">{h.days}</span>
                   <span className="text-foreground font-medium">{h.hours}</span>
@@ -51,11 +53,11 @@ export function SiteFooter() {
               </span>
             </div>
             <address className="not-italic text-sm text-muted-foreground leading-relaxed mb-4">
-              233 East 84th Street<br />
-              New York, NY 10028
+              {STREET_ADDRESS}<br />
+              {ADDRESS_LOCALITY}, {ADDRESS_REGION} {POSTAL_CODE}
             </address>
             <a
-              href="https://maps.google.com/?q=233+East+84th+Street+New+York+NY"
+              href={MAPS_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-primary hover:underline"
@@ -90,7 +92,7 @@ export function SiteFooter() {
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
           <p>&copy; {new Date().getFullYear()} Upper East Watch Repair. All rights reserved.</p>
-          <p>233 East 84th Street, New York, NY 10028</p>
+          <p>{ADDRESS_SINGLE_LINE}</p>
         </div>
       </div>
     </footer>

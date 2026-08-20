@@ -6,19 +6,14 @@ import { Separator } from '@workspace/upper-east-horology/components/ui/separato
 import { PageMeta } from '@/components/PageMeta';
 import { Section, SectionHeading } from '@/components/Section';
 import { WatchPoster } from '@/components/WatchPoster';
-
-// TODO(hours): confirm exact hours
-const HOURS = [
-  { days: 'Monday', hours: '10:00 am – 6:00 pm' },
-  { days: 'Tuesday', hours: '10:00 am – 6:00 pm' },
-  { days: 'Wednesday', hours: '10:00 am – 6:00 pm' },
-  { days: 'Thursday', hours: '10:00 am – 6:00 pm' },
-  { days: 'Friday', hours: '10:00 am – 6:00 pm' },
-  { days: 'Saturday', hours: 'Closed' },
-  { days: 'Sunday', hours: '11:00 am – 5:00 pm' },
-];
-
-const MAPS_URL = 'https://maps.google.com/?q=233+East+84th+Street+New+York+NY';
+import {
+  ADDRESS_LOCALITY,
+  ADDRESS_REGION,
+  HOURS_DISPLAY,
+  MAPS_URL,
+  POSTAL_CODE,
+  STREET_ADDRESS,
+} from '@/data/business';
 
 export default function AboutPage() {
   return (
@@ -100,8 +95,8 @@ export default function AboutPage() {
                   </span>
                 </div>
                 <address className="not-italic text-foreground leading-relaxed mb-4">
-                  233 East 84th Street<br />
-                  New York, NY 10028
+                  {STREET_ADDRESS}<br />
+                  {ADDRESS_LOCALITY}, {ADDRESS_REGION} {POSTAL_CODE}
                 </address>
                 <a href={MAPS_URL} target="_blank" rel="noopener noreferrer">
                   <Button variant="outline" className="w-full" data-testid="button-directions">
@@ -119,7 +114,7 @@ export default function AboutPage() {
                   </span>
                 </div>
                 <ul className="space-y-2">
-                  {HOURS.map((h) => (
+                  {HOURS_DISPLAY.map((h) => (
                     <li key={h.days} className="flex justify-between gap-4 text-sm">
                       <span className="text-muted-foreground">{h.days}</span>
                       <span className="text-foreground font-medium">{h.hours}</span>
@@ -149,9 +144,11 @@ export default function AboutPage() {
                 <MapPin className="h-6 w-6 text-primary" />
               </div>
               <p className="font-serif text-2xl font-semibold text-foreground">
-                233 East 84th Street
+                {STREET_ADDRESS}
               </p>
-              <p className="text-muted-foreground mt-1">New York, NY 10028</p>
+              <p className="text-muted-foreground mt-1">
+                {ADDRESS_LOCALITY}, {ADDRESS_REGION} {POSTAL_CODE}
+              </p>
               <p className="text-sm text-primary mt-3 group-hover:underline">
                 Open in Google Maps
               </p>

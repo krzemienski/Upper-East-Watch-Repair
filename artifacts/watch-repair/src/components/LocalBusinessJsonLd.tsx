@@ -1,4 +1,13 @@
 import { useEffect } from 'react';
+import {
+  ADDRESS_LOCALITY,
+  ADDRESS_REGION,
+  BUSINESS_NAME,
+  OPENING_HOURS,
+  OPENING_HOURS_SPEC,
+  POSTAL_CODE,
+  STREET_ADDRESS,
+} from '@/data/business';
 
 export function LocalBusinessJsonLd() {
   useEffect(() => {
@@ -8,17 +17,16 @@ export function LocalBusinessJsonLd() {
     const schema = {
       '@context': 'https://schema.org',
       '@type': 'LocalBusiness',
-      name: 'Upper East Watch Repair',
+      name: BUSINESS_NAME,
       description:
         'Trusted neighborhood watch and jewelry repair bench at 233 East 84th Street, Manhattan. Serving the Upper East Side with expert mechanical and quartz watch repair, battery replacement, ring resizing, and fine jewelry repair.',
       url: window.location.origin,
-      telephone: '',
       address: {
         '@type': 'PostalAddress',
-        streetAddress: '233 East 84th Street',
-        addressLocality: 'New York',
-        addressRegion: 'NY',
-        postalCode: '10028',
+        streetAddress: STREET_ADDRESS,
+        addressLocality: ADDRESS_LOCALITY,
+        addressRegion: ADDRESS_REGION,
+        postalCode: POSTAL_CODE,
         addressCountry: 'US',
       },
       geo: {
@@ -26,20 +34,8 @@ export function LocalBusinessJsonLd() {
         latitude: 40.7763,
         longitude: -73.9535,
       },
-      openingHoursSpecification: [
-        {
-          '@type': 'OpeningHoursSpecification',
-          dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-          opens: '10:00',
-          closes: '18:00',
-        },
-        {
-          '@type': 'OpeningHoursSpecification',
-          dayOfWeek: ['Sunday'],
-          opens: '11:00',
-          closes: '17:00',
-        },
-      ],
+      openingHours: OPENING_HOURS,
+      openingHoursSpecification: OPENING_HOURS_SPEC,
       priceRange: '$$',
       currenciesAccepted: 'USD',
       paymentAccepted: 'Cash, Credit Card',

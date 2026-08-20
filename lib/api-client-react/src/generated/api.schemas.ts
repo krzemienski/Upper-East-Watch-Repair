@@ -112,6 +112,8 @@ export interface AuthUser {
   lastName: string | null;
   /** @nullable */
   profileImageUrl: string | null;
+  /** Whether this authenticated identity may access guide administration */
+  isAdmin?: boolean;
 }
 
 export interface AuthUserEnvelope {
