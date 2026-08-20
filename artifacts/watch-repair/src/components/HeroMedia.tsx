@@ -16,17 +16,18 @@ interface HeroMediaProps {
 
 /**
  * Cinematic hero background.
- * - Plays a generated 16:9 movement video (autoplay, muted, loop, playsInline, preload=none)
- *   on desktop when motion is allowed.
- * - Falls back to a static poster below 768px OR when reduced motion is preferred.
- * - Moves at 0.4× scroll speed on desktop and pauses when off-screen.
+ * - Plays a generated 16:9 movement video (autoplay, muted, loop, playsInline)
+ *   at every viewport size when motion is allowed.
+ * - Falls back to a static poster only when reduced motion is preferred.
+ * - Moves at 0.4× scroll speed on desktop, stays still on mobile, and pauses
+ *   when off-screen.
  * - The abstract SVG WatchPoster renders beneath the poster/video as a guaranteed
  *   local fallback so the hero never shows a broken/blank surface before assets load.
  */
 export function HeroMedia({ className }: HeroMediaProps) {
   const reducedMotion = usePrefersReducedMotion();
   const isMobile = useIsMobile();
-  const showStatic = reducedMotion || isMobile;
+  const showStatic = reducedMotion;
   const [mediaFailed, setMediaFailed] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const motionLayerRef = useRef<HTMLDivElement>(null);
@@ -45,6 +46,11 @@ export function HeroMedia({ className }: HeroMediaProps) {
 
     const updateParallax = () => {
       frame = 0;
+      if (isMobile) {
+        motionLayer.style.transform = 'translate3d(0, 0, 0)';
+        return;
+      }
+
       const scrollInsideHero = Math.max(0, -container.getBoundingClientRect().top);
       motionLayer.style.transform = `translate3d(0, ${scrollInsideHero * 0.4}px, 0)`;
     };
@@ -73,16 +79,20 @@ export function HeroMedia({ className }: HeroMediaProps) {
 
     observer.observe(container);
     video.addEventListener('canplay', syncPlayback);
-    window.addEventListener('scroll', requestParallaxUpdate, { passive: true });
+    if (!isMobile) {
+      window.addEventListener('scroll', requestParallaxUpdate, { passive: true });
+    }
     updateParallax();
 
     return () => {
       observer.disconnect();
       video.removeEventListener('canplay', syncPlayback);
-      window.removeEventListener('scroll', requestParallaxUpdate);
+      if (!isMobile) {
+        window.removeEventListener('scroll', requestParallaxUpdate);
+      }
       if (frame) window.cancelAnimationFrame(frame);
     };
-  }, [mediaFailed, showStatic]);
+  }, [isMobile, mediaFailed, showStatic]);
 
   return (
     <div

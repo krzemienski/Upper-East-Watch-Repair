@@ -66,9 +66,10 @@ The element is `autoplay`, `muted`, `loop`, `playsInline`, and `preload="none"`.
 
 - Desktop, motion allowed: the media layer translates at 0.4× scroll speed via
   one `requestAnimationFrame`-throttled listener.
+- Mobile, motion allowed: the same muted inline video plays in portrait and
+  landscape without parallax.
 - Off-screen: `IntersectionObserver` pauses playback and resumes it when the
   hero returns.
-- Below 768 px: the video element is not rendered; the static poster is used.
 - `prefers-reduced-motion: reduce`: the video element is not rendered and there
   is no parallax.
 - Failure fallback: a local token-driven SVG watch motif remains behind every
