@@ -1,0 +1,19 @@
+kind = "design-system"
+previewPath = "/upper-east-horology/"
+title = "Upper East Horology Design System"
+description = "A luxury-horology design system for Upper East Watch Repair, defining a dark cinematic visual language with precise turquoise, dark ink, and silver tokens, accessible components, and a living style guide for the website and future customer-facing touchpoints."
+version = "1.0.0"
+id = "artifacts/upper-east-horology"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/upper-east-horology/" ]
+localPort = 23273
+
+[services.development]
+run = "pnpm --filter @workspace/upper-east-horology run dev"
+
+[services.env]
+PORT = "23273"
+BASE_PATH = "/upper-east-horology/"

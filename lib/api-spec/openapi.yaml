@@ -3,20 +3,25 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Upper East Watch Repair API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: guides
+    description: Public guide publishing
+  - name: admin
+    description: Protected guide administration
+  - name: Auth
+    description: Browser authentication endpoints
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +29,366 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /guides:
+    get:
+      operationId: listPublishedGuides
+      tags: [guides]
+      summary: List published guides newest first
+      responses:
+        "200":
+          description: Published guides
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Guide"
+  /guides/{slug}:
+    get:
+      operationId: getPublishedGuide
+      tags: [guides]
+      summary: Get one published guide
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Published guide
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Guide"
+        "404":
+          description: Guide not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+  /admin/guides:
+    get:
+      operationId: listAdminGuides
+      tags: [admin]
+      summary: List all guides for the editor
+      responses:
+        "200":
+          description: All guides
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Guide"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+    post:
+      operationId: createGuide
+      tags: [admin]
+      summary: Create a guide
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GuideInput"
+      responses:
+        "201":
+          description: Guide created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Guide"
+        "400":
+          description: Invalid guide
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+  /admin/guides/{id}:
+    patch:
+      operationId: updateGuide
+      tags: [admin]
+      summary: Update and publish or unpublish a guide
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GuideUpdate"
+      responses:
+        "200":
+          description: Guide updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Guide"
+        "400":
+          description: Invalid update
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "404":
+          description: Guide not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+  /admin/guides/summary:
+    get:
+      operationId: getGuideSummary
+      tags: [admin]
+      summary: Get guide counts by publication state
+      responses:
+        "200":
+          description: Guide summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GuideSummary"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+  /auth/user:
+    get:
+      tags: [Auth]
+      operationId: getCurrentAuthUser
+      summary: Get the currently authenticated user
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationSessionHeader"
+        - $ref: "#/components/parameters/SessionCookie"
+      responses:
+        "200":
+          description: Auth status resolved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthUserEnvelope"
+  /login:
+    get:
+      tags: [Auth]
+      operationId: beginBrowserLogin
+      summary: Start browser login
+      parameters:
+        - name: returnTo
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "302":
+          description: Redirect to identity provider
+  /callback:
+    get:
+      tags: [Auth]
+      operationId: handleBrowserLoginCallback
+      summary: Complete browser login
+      responses:
+        "302":
+          description: Redirect after authentication
+  /logout:
+    get:
+      tags: [Auth]
+      operationId: logoutBrowserSession
+      summary: Clear the browser session
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationSessionHeader"
+        - $ref: "#/components/parameters/SessionCookie"
+        - name: returnTo
+          in: query
+          required: false
+          schema:
+            type: string
+            default: /
+      responses:
+        "302":
+          description: Redirect after logout
 components:
+  parameters:
+    AuthorizationSessionHeader:
+      name: Authorization
+      in: header
+      required: false
+      schema:
+        type: string
+    SessionCookie:
+      name: sid
+      in: cookie
+      required: false
+      schema:
+        type: string
   schemas:
     HealthStatus:
       type: object
       properties:
         status:
           type: string
+      required: [status]
+    Guide:
+      type: object
       required:
+        - id
+        - slug
+        - title
+        - excerpt
+        - body
+        - author
         - status
-
+        - metaDescription
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: integer
+          format: int32
+        slug:
+          type: string
+        title:
+          type: string
+        excerpt:
+          type: string
+        body:
+          type: string
+        author:
+          type: string
+        status:
+          type: string
+          enum: [draft, published]
+        publishedAt:
+          type: [string, "null"]
+          format: date-time
+        metaDescription:
+          type: string
+        ogImage:
+          type: [string, "null"]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    GuideInput:
+      type: object
+      required: [slug, title, excerpt, body, author, status, metaDescription]
+      properties:
+        slug:
+          type: string
+          minLength: 1
+          pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        title:
+          type: string
+          minLength: 1
+        excerpt:
+          type: string
+          minLength: 1
+        body:
+          type: string
+        author:
+          type: string
+          minLength: 1
+        status:
+          type: string
+          enum: [draft, published]
+        metaDescription:
+          type: string
+          minLength: 1
+          maxLength: 160
+        ogImage:
+          type: [string, "null"]
+    GuideUpdate:
+      type: object
+      properties:
+        slug:
+          type: string
+          minLength: 1
+          pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        title:
+          type: string
+          minLength: 1
+        excerpt:
+          type: string
+          minLength: 1
+        body:
+          type: string
+        author:
+          type: string
+          minLength: 1
+        status:
+          type: string
+          enum: [draft, published]
+        metaDescription:
+          type: string
+          minLength: 1
+          maxLength: 160
+        ogImage:
+          type: [string, "null"]
+    GuideSummary:
+      type: object
+      required: [total, published, drafts]
+      properties:
+        total:
+          type: integer
+          format: int32
+        published:
+          type: integer
+          format: int32
+        drafts:
+          type: integer
+          format: int32
+    AuthUser:
+      type: object
+      required: [id, email, firstName, lastName, profileImageUrl]
+      properties:
+        id:
+          type: string
+        email:
+          type: [string, "null"]
+          format: email
+        firstName:
+          type: [string, "null"]
+        lastName:
+          type: [string, "null"]
+        profileImageUrl:
+          type: [string, "null"]
+    AuthUserEnvelope:
+      type: object
+      required: [user]
+      properties:
+        user:
+          oneOf:
+            - $ref: "#/components/schemas/AuthUser"
+            - type: "null"
+    ErrorEnvelope:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
