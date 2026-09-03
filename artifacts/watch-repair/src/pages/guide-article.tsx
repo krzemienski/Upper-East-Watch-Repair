@@ -20,6 +20,7 @@ import { PageMeta } from '@/components/PageMeta';
 import { ArticleJsonLd } from '@/components/ArticleJsonLd';
 import { AdSlot } from '@/components/AdSlot';
 import { Section } from '@/components/Section';
+import { SITE_URL, WORKBENCH_OG_IMAGE_URL } from '@/data/business';
 import { renderMarkdown, extractToc, readingTime } from '@/lib/markdown';
 
 export default function GuideArticlePage() {
@@ -88,6 +89,8 @@ export default function GuideArticlePage() {
       <PageMeta
         title={`${guide.title} | Upper East Watch Repair`}
         description={guide.metaDescription || guide.excerpt}
+        canonical={`${SITE_URL}/guides/${guide.slug}`}
+        image={guide.ogImage || WORKBENCH_OG_IMAGE_URL}
       />
       <ArticleJsonLd guide={guide} />
 

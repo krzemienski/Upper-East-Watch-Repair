@@ -1,0 +1,1 @@
+- [Generated Markdown ingestion](generated-markdown-ingestion.md) — normalize CRLF and use shell-backed reads if durable file callbacks lag behind newly generated files.

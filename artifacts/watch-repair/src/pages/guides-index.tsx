@@ -22,7 +22,13 @@ import {
 } from '@workspace/upper-east-horology/components/ui/empty';
 import { PageMeta } from '@/components/PageMeta';
 import { Section } from '@/components/Section';
+import { SITE_URL, WORKBENCH_OG_IMAGE_URL } from '@/data/business';
 import { readingTime } from '@/lib/markdown';
+
+const BASE_PATH = import.meta.env.BASE_URL.endsWith('/')
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+const WORKBENCH_IMAGE_SRC = `${BASE_PATH}media/upper-east-watch-repair-workbench.webp`;
 
 function GuideCardSkeleton() {
   return (
@@ -45,6 +51,8 @@ export default function GuidesIndexPage() {
       <PageMeta
         title="Watch Care Guides | Upper East Watch Repair"
         description="Practical guides on watch care, battery life, water resistance, and jewelry maintenance from the bench at Upper East Watch Repair."
+        canonical={`${SITE_URL}/guides`}
+        image={WORKBENCH_OG_IMAGE_URL}
       />
 
       <Section className="pt-12 lg:pt-16 pb-8">
@@ -56,17 +64,33 @@ export default function GuidesIndexPage() {
           <span className="text-foreground">Guides</span>
         </nav>
 
-        <div className="max-w-2xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary mb-3">
-            From the bench
-          </p>
-          <h1 className="font-serif text-4xl sm:text-5xl font-semibold text-foreground leading-[1.05]">
-            Watch &amp; jewelry care guides
-          </h1>
-          <p className="mt-5 text-lg text-muted-foreground leading-relaxed">
-            Practical, honest advice on keeping your timepieces and jewelry in the best
-            possible condition — straight from the people at the bench.
-          </p>
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_22rem] gap-10 lg:gap-16 items-end">
+          <div className="max-w-2xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary mb-3">
+              From the bench
+            </p>
+            <h1 className="font-serif text-4xl sm:text-5xl font-semibold text-foreground leading-[1.05]">
+              Watch &amp; jewelry care guides
+            </h1>
+            <p className="mt-5 text-lg text-muted-foreground leading-relaxed">
+              Practical, honest advice on keeping your timepieces and jewelry in the best
+              possible condition — straight from the people at the bench.
+            </p>
+          </div>
+
+          <figure className="overflow-hidden rounded-lg border border-border bg-card">
+            <img
+              src={WORKBENCH_IMAGE_SRC}
+              alt="The street-facing watch repair workbench at Upper East Watch Repair, with organized batteries, precision tools, and watches in progress"
+              width="1200"
+              height="1600"
+              className="aspect-[4/3] w-full object-cover object-center"
+              loading="eager"
+            />
+            <figcaption className="px-4 py-3 text-xs leading-relaxed text-muted-foreground">
+              Inside the repair bench at 233 East 84th Street.
+            </figcaption>
+          </figure>
         </div>
       </Section>
 

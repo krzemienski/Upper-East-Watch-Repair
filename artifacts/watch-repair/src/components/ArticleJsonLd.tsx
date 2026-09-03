@@ -9,7 +9,7 @@ export function ArticleJsonLd({ guide }: { guide: Guide }) {
       headline: guide.title,
       description: guide.metaDescription || guide.excerpt,
       author: {
-        '@type': 'Person',
+        '@type': 'Organization',
         name: guide.author,
       },
       publisher: {

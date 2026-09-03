@@ -1,2 +1,3 @@
 User-agent: *
 Allow: /
+Sitemap: https://upper-east-watch-repair.replit.app/sitemap.xml

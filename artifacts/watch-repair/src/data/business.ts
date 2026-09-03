@@ -1,4 +1,7 @@
 export const BUSINESS_NAME = 'Upper East Watch Repair';
+export const SITE_URL = 'https://upper-east-watch-repair.replit.app';
+export const WORKBENCH_OG_IMAGE_URL =
+  `${SITE_URL}/media/upper-east-watch-repair-workbench-og.webp`;
 export const STREET_ADDRESS = '233 East 84th Street';
 export const ADDRESS_LOCALITY = 'New York';
 export const ADDRESS_REGION = 'NY';
