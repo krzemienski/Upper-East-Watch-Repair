@@ -20,6 +20,9 @@ import BookPage from '@/pages/book';
 import GuidesIndexPage from '@/pages/guides-index';
 import GuideArticlePage from '@/pages/guide-article';
 import AdminPage from '@/pages/admin';
+import AdminLeadsPage from '@/pages/admin-leads';
+import RepairPage from '@/pages/repair';
+import RepairIntakePage from '@/pages/repair-intake';
 import DesignSystemRedirect from '@/pages/design-system-redirect';
 import NotFound from '@/pages/not-found';
 
@@ -43,6 +46,7 @@ function SiteRoutes() {
         <Route path="/services/jewelry-repair" component={ServiceJewelryRepairPage} />
         <Route path="/about" component={AboutPage} />
         <Route path="/book" component={BookPage} />
+        <Route path="/repair" component={RepairPage} />
         <Route path="/guides" component={GuidesIndexPage} />
         <Route path="/guides/:slug" component={GuideArticlePage} />
         <Route component={NotFound} />
@@ -56,7 +60,14 @@ function Router() {
     <RoutedErrorBoundary>
       <Switch>
         {/* Standalone routes without the marketing shell */}
+        <Route path="/admin/leads" component={AdminLeadsPage} />
         <Route path="/admin" component={AdminPage} />
+        <Route path="/repair/intake/in-store">
+          <RepairIntakePage inStore />
+        </Route>
+        <Route path="/repair/intake">
+          <RepairIntakePage />
+        </Route>
         <Route path="/design-system" component={DesignSystemRedirect} />
         {/* Everything else uses the public site shell */}
         <Route component={SiteRoutes} />

@@ -231,8 +231,246 @@ paths:
       responses:
         "302":
           description: Redirect after logout
+  /funnel-events:
+    post:
+      operationId: createFunnelEvent
+      tags: [leads]
+      summary: Record a public funnel interaction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/FunnelEventInput" }
+      responses:
+        "201":
+          description: Event recorded
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/FunnelEvent" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+  /leads:
+    post:
+      operationId: createRepairLead
+      tags: [leads]
+      summary: Submit a repair lead
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LeadInput" }
+      responses:
+        "201":
+          description: Lead submitted
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/LeadCreated" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+  /leads/{id}/uploads/request-url:
+    post:
+      operationId: requestLeadUploadUrl
+      tags: [leads]
+      parameters:
+        - $ref: "#/components/parameters/LeadId"
+        - $ref: "#/components/parameters/UploadToken"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UploadRequest" }
+      responses:
+        "200":
+          description: Presigned upload target
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UploadTarget" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /leads/{id}/attachments:
+    post:
+      operationId: finalizeLeadAttachment
+      tags: [leads]
+      parameters:
+        - $ref: "#/components/parameters/LeadId"
+        - $ref: "#/components/parameters/UploadToken"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AttachmentInput" }
+      responses:
+        "201":
+          description: Attachment finalized
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/LeadAttachment" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /admin/leads:
+    get:
+      operationId: listRepairLeads
+      tags: [admin]
+      parameters:
+        - { name: status, in: query, schema: { $ref: "#/components/schemas/LeadStatus" } }
+        - { name: search, in: query, schema: { type: string } }
+        - { name: source, in: query, schema: { type: string } }
+        - { name: from, in: query, schema: { type: string, format: date-time } }
+        - { name: to, in: query, schema: { type: string, format: date-time } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 50 } }
+        - { name: offset, in: query, schema: { type: integer, minimum: 0, default: 0 } }
+      responses:
+        "200":
+          description: Filtered leads
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/RepairLead" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /admin/leads/report:
+    get:
+      operationId: getRepairLeadReport
+      tags: [admin]
+      responses:
+        "200":
+          description: Lead funnel summary
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/LeadReport" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /admin/leads/{id}:
+    get:
+      operationId: getRepairLead
+      tags: [admin]
+      parameters: [{ $ref: "#/components/parameters/LeadId" }]
+      responses:
+        "200":
+          description: Full lead record
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RepairLeadDetail" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    patch:
+      operationId: updateRepairLead
+      tags: [admin]
+      parameters: [{ $ref: "#/components/parameters/LeadId" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LeadUpdate" }
+      responses:
+        "200":
+          description: Updated lead
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RepairLead" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /admin/leads/{id}/notes:
+    post:
+      operationId: addRepairLeadNote
+      tags: [admin]
+      parameters: [{ $ref: "#/components/parameters/LeadId" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LeadNoteInput" }
+      responses:
+        "201":
+          description: Note added
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/LeadEvent" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /admin/leads/{id}/attachments/{attachmentId}:
+    get:
+      operationId: downloadRepairLeadAttachment
+      tags: [admin]
+      parameters:
+        - $ref: "#/components/parameters/LeadId"
+        - name: attachmentId
+          in: path
+          required: true
+          schema: { type: integer, format: int32 }
+      responses:
+        "200":
+          description: Private image bytes
+          content:
+            image/jpeg: { schema: { type: string, format: binary } }
+            image/png: { schema: { type: string, format: binary } }
+            image/webp: { schema: { type: string, format: binary } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /admin/follow-ups:
+    get:
+      operationId: listFollowUps
+      tags: [admin]
+      parameters:
+        - { name: status, in: query, schema: { type: string, enum: [pending, completed, cancelled] } }
+        - { name: dueBefore, in: query, schema: { type: string, format: date-time } }
+      responses:
+        "200":
+          description: Follow-up tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/FollowUpTask" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /admin/follow-ups/{id}:
+    patch:
+      operationId: updateFollowUp
+      tags: [admin]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, format: int32 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/FollowUpUpdate" }
+      responses:
+        "200":
+          description: Updated follow-up
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/FollowUpTask" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
 components:
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorEnvelope" }
   parameters:
+    LeadId:
+      name: id
+      in: path
+      required: true
+      schema: { type: integer, format: int32 }
+    UploadToken:
+      name: X-Lead-Upload-Token
+      in: header
+      required: true
+      schema: { type: string, minLength: 32 }
     AuthorizationSessionHeader:
       name: Authorization
       in: header
@@ -246,6 +484,201 @@ components:
       schema:
         type: string
   schemas:
+    LeadStatus:
+      type: string
+      enum: [new, contacted, visit_planned, watch_received, estimate_pending, won, lost]
+    Attribution:
+      type: object
+      properties:
+        utmSource: { type: string, maxLength: 255 }
+        utmMedium: { type: string, maxLength: 255 }
+        utmCampaign: { type: string, maxLength: 255 }
+        utmTerm: { type: string, maxLength: 255 }
+        utmContent: { type: string, maxLength: 255 }
+        referrer: { type: string, maxLength: 2000 }
+        source: { type: string, maxLength: 255 }
+        variant: { type: string, maxLength: 120 }
+        device: { type: string, maxLength: 80 }
+        selectedCta: { type: string, maxLength: 160 }
+    FunnelEventInput:
+      allOf:
+        - $ref: "#/components/schemas/Attribution"
+        - type: object
+          required: [event]
+          properties:
+            event: { type: string, minLength: 1, maxLength: 80 }
+            sessionId: { type: string, maxLength: 255 }
+            leadId: { type: integer, format: int32 }
+            metadata: { type: object, additionalProperties: true }
+    FunnelEvent:
+      allOf:
+        - $ref: "#/components/schemas/FunnelEventInput"
+        - type: object
+          required: [id, createdAt]
+          properties:
+            id: { type: integer, format: int32 }
+            createdAt: { type: string, format: date-time }
+    LeadInput:
+      allOf:
+        - $ref: "#/components/schemas/Attribution"
+        - type: object
+          required: [name, description]
+          properties:
+            name: { type: string, minLength: 1, maxLength: 160 }
+            email: { type: string, format: email, maxLength: 320 }
+            phone: { type: string, minLength: 5, maxLength: 40 }
+            preferredChannel: { type: string, enum: [email, phone, sms, none], default: none }
+            emailConsent: { type: boolean, default: false }
+            phoneConsent: { type: boolean, default: false }
+            smsConsent: { type: boolean, default: false }
+            serviceNeeded: { type: string, maxLength: 120 }
+            watchBrand: { type: string, maxLength: 120 }
+            watchModel: { type: string, maxLength: 120 }
+            description: { type: string, minLength: 1, maxLength: 5000 }
+            intakeMode: { type: string, enum: [mail_in, in_store, unsure], default: unsure }
+    RepairLead:
+      allOf:
+        - $ref: "#/components/schemas/LeadInput"
+        - type: object
+          required: [id, status, preferredChannel, emailConsent, phoneConsent, smsConsent, intakeMode, createdAt, updatedAt]
+          properties:
+            id: { type: integer, format: int32 }
+            status: { $ref: "#/components/schemas/LeadStatus" }
+            adminOwner: { type: [string, "null"] }
+            adminSummary: { type: [string, "null"] }
+            createdAt: { type: string, format: date-time }
+            updatedAt: { type: string, format: date-time }
+    LeadCreated:
+      type: object
+      required: [lead, uploadToken, uploadTokenExpiresAt]
+      properties:
+        lead: { $ref: "#/components/schemas/RepairLead" }
+        uploadToken: { type: string }
+        uploadTokenExpiresAt: { type: string, format: date-time }
+    UploadRequest:
+      type: object
+      required: [name, size, contentType]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 255 }
+        size: { type: integer, minimum: 1, maximum: 8388608 }
+        contentType: { type: string, enum: [image/jpeg, image/png, image/webp] }
+    UploadTarget:
+      type: object
+      required: [uploadURL, objectPath]
+      properties:
+        uploadURL: { type: string, format: uri }
+        objectPath: { type: string }
+    AttachmentInput:
+      allOf:
+        - $ref: "#/components/schemas/UploadRequest"
+        - type: object
+          required: [objectPath]
+          properties:
+            objectPath: { type: string, pattern: "^/objects/repair-leads/[1-9][0-9]*/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" }
+    LeadAttachment:
+      type: object
+      required: [id, leadId, objectPath, originalName, contentType, size, createdAt]
+      properties:
+        id: { type: integer, format: int32 }
+        leadId: { type: integer, format: int32 }
+        objectPath: { type: string }
+        originalName: { type: string }
+        contentType: { type: string }
+        size: { type: integer }
+        createdAt: { type: string, format: date-time }
+    LeadEvent:
+      type: object
+      required: [id, leadId, type, createdAt]
+      properties:
+        id: { type: integer, format: int32 }
+        leadId: { type: integer, format: int32 }
+        type: { type: string }
+        note: { type: [string, "null"] }
+        fromStatus: { type: [string, "null"] }
+        toStatus: { type: [string, "null"] }
+        actorUserId: { type: [string, "null"] }
+        metadata: { type: [object, "null"], additionalProperties: true }
+        createdAt: { type: string, format: date-time }
+    RepairLeadDetail:
+      type: object
+      required: [lead, attachments, events, followUps]
+      properties:
+        lead: { $ref: "#/components/schemas/RepairLead" }
+        attachments:
+          type: array
+          items: { $ref: "#/components/schemas/LeadAttachment" }
+        events:
+          type: array
+          items: { $ref: "#/components/schemas/LeadEvent" }
+        followUps:
+          type: array
+          items: { $ref: "#/components/schemas/FollowUpTask" }
+    LeadUpdate:
+      type: object
+      minProperties: 1
+      properties:
+        status: { $ref: "#/components/schemas/LeadStatus" }
+        adminOwner: { type: [string, "null"], maxLength: 160 }
+        adminSummary: { type: [string, "null"], maxLength: 5000 }
+    LeadNoteInput:
+      type: object
+      required: [note]
+      properties:
+        note: { type: string, minLength: 1, maxLength: 5000 }
+    FollowUpTask:
+      type: object
+      required: [id, leadId, channel, status, dueAt, createdAt, updatedAt]
+      properties:
+        id: { type: integer, format: int32 }
+        leadId: { type: integer, format: int32 }
+        channel: { type: string, enum: [email, phone, sms] }
+        status: { type: string, enum: [pending, completed, cancelled] }
+        dueAt: { type: string, format: date-time }
+        completedAt: { type: [string, "null"], format: date-time }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    FollowUpUpdate:
+      type: object
+      minProperties: 1
+      properties:
+        status: { type: string, enum: [pending, completed, cancelled] }
+        dueAt: { type: string, format: date-time }
+    LeadReport:
+      type: object
+      required:
+        - total
+        - byStatus
+        - bySource
+        - byCampaign
+        - byVariant
+        - byServiceNeeded
+        - metrics
+        - stageConversionPercentages
+        - conversionRate
+      properties:
+        total: { type: integer }
+        byStatus: { type: object, additionalProperties: { type: integer } }
+        bySource: { type: object, additionalProperties: { type: integer } }
+        byCampaign: { type: object, additionalProperties: { type: integer } }
+        byVariant: { type: object, additionalProperties: { type: integer } }
+        byServiceNeeded: { type: object, additionalProperties: { type: integer } }
+        metrics:
+          type: object
+          required: [callClicks, directionsClicks, intakeSubmissions, watchesReceived, wonRepairs]
+          properties:
+            callClicks: { type: integer }
+            directionsClicks: { type: integer }
+            intakeSubmissions: { type: integer }
+            watchesReceived: { type: integer }
+            wonRepairs: { type: integer }
+        stageConversionPercentages:
+          type: object
+          required: [intakeToWatchReceived, watchReceivedToWon, intakeToWon]
+          properties:
+            intakeToWatchReceived: { type: number }
+            watchReceivedToWon: { type: number }
+            intakeToWon: { type: number }
+        conversionRate: { type: number }
     HealthStatus:
       type: object
       properties:

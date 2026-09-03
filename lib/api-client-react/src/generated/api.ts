@@ -20,15 +20,36 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AttachmentInput,
   AuthUserEnvelope,
+  BadRequestResponse,
   BeginBrowserLoginParams,
   ErrorEnvelope,
+  FollowUpTask,
+  FollowUpUpdate,
+  FunnelEvent,
+  FunnelEventInput,
   Guide,
   GuideInput,
   GuideSummary,
   GuideUpdate,
   HealthStatus,
-  LogoutBrowserSessionParams
+  LeadAttachment,
+  LeadCreated,
+  LeadEvent,
+  LeadInput,
+  LeadNoteInput,
+  LeadReport,
+  LeadUpdate,
+  ListFollowUpsParams,
+  ListRepairLeadsParams,
+  LogoutBrowserSessionParams,
+  NotFoundResponse,
+  RepairLead,
+  RepairLeadDetail,
+  UnauthorizedResponse,
+  UploadRequest,
+  UploadTarget
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -907,4 +928,850 @@ export function useLogoutBrowserSession<TData = Awaited<ReturnType<typeof logout
 
 
 
+
+export const getCreateFunnelEventUrl = () => {
+
+
+
+
+  return `/api/funnel-events`
+}
+
+/**
+ * @summary Record a public funnel interaction
+ */
+export const createFunnelEvent = async (funnelEventInput: FunnelEventInput, options?: Parameters<typeof customFetch>[1]): Promise<FunnelEvent> => {
+
+  return customFetch<FunnelEvent>(getCreateFunnelEventUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(funnelEventInput)
+  }
+);}
+
+
+
+
+
+export const getCreateFunnelEventMutationOptions = <TError = ErrorType<BadRequestResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createFunnelEvent>>, TError,{data: BodyType<FunnelEventInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createFunnelEvent>>, TError,{data: BodyType<FunnelEventInput>}, TContext> => {
+
+const mutationKey = ['createFunnelEvent'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createFunnelEvent>>, {data: BodyType<FunnelEventInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createFunnelEvent(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateFunnelEventMutationResult = NonNullable<Awaited<ReturnType<typeof createFunnelEvent>>>
+    export type CreateFunnelEventMutationBody = BodyType<FunnelEventInput>
+    export type CreateFunnelEventMutationError = ErrorType<BadRequestResponse>
+
+    /**
+ * @summary Record a public funnel interaction
+ */
+export const useCreateFunnelEvent = <TError = ErrorType<BadRequestResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createFunnelEvent>>, TError,{data: BodyType<FunnelEventInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createFunnelEvent>>,
+        TError,
+        {data: BodyType<FunnelEventInput>},
+        TContext
+      > => {
+      return useMutation(getCreateFunnelEventMutationOptions(options));
+    }
+
+export const getCreateRepairLeadUrl = () => {
+
+
+
+
+  return `/api/leads`
+}
+
+/**
+ * @summary Submit a repair lead
+ */
+export const createRepairLead = async (leadInput: LeadInput, options?: Parameters<typeof customFetch>[1]): Promise<LeadCreated> => {
+
+  return customFetch<LeadCreated>(getCreateRepairLeadUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(leadInput)
+  }
+);}
+
+
+
+
+
+export const getCreateRepairLeadMutationOptions = <TError = ErrorType<BadRequestResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createRepairLead>>, TError,{data: BodyType<LeadInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createRepairLead>>, TError,{data: BodyType<LeadInput>}, TContext> => {
+
+const mutationKey = ['createRepairLead'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createRepairLead>>, {data: BodyType<LeadInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createRepairLead(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateRepairLeadMutationResult = NonNullable<Awaited<ReturnType<typeof createRepairLead>>>
+    export type CreateRepairLeadMutationBody = BodyType<LeadInput>
+    export type CreateRepairLeadMutationError = ErrorType<BadRequestResponse>
+
+    /**
+ * @summary Submit a repair lead
+ */
+export const useCreateRepairLead = <TError = ErrorType<BadRequestResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createRepairLead>>, TError,{data: BodyType<LeadInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createRepairLead>>,
+        TError,
+        {data: BodyType<LeadInput>},
+        TContext
+      > => {
+      return useMutation(getCreateRepairLeadMutationOptions(options));
+    }
+
+export const getRequestLeadUploadUrlUrl = (id: number,) => {
+
+
+
+
+  return `/api/leads/${id}/uploads/request-url`
+}
+
+export const requestLeadUploadUrl = async (id: number,
+    uploadRequest: UploadRequest, options?: Parameters<typeof customFetch>[1]): Promise<UploadTarget> => {
+
+  return customFetch<UploadTarget>(getRequestLeadUploadUrlUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(uploadRequest)
+  }
+);}
+
+
+
+
+
+export const getRequestLeadUploadUrlMutationOptions = <TError = ErrorType<BadRequestResponse | UnauthorizedResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestLeadUploadUrl>>, TError,{id: number;data: BodyType<UploadRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof requestLeadUploadUrl>>, TError,{id: number;data: BodyType<UploadRequest>}, TContext> => {
+
+const mutationKey = ['requestLeadUploadUrl'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof requestLeadUploadUrl>>, {id: number;data: BodyType<UploadRequest>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  requestLeadUploadUrl(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RequestLeadUploadUrlMutationResult = NonNullable<Awaited<ReturnType<typeof requestLeadUploadUrl>>>
+    export type RequestLeadUploadUrlMutationBody = BodyType<UploadRequest>
+    export type RequestLeadUploadUrlMutationError = ErrorType<BadRequestResponse | UnauthorizedResponse>
+
+    export const useRequestLeadUploadUrl = <TError = ErrorType<BadRequestResponse | UnauthorizedResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestLeadUploadUrl>>, TError,{id: number;data: BodyType<UploadRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof requestLeadUploadUrl>>,
+        TError,
+        {id: number;data: BodyType<UploadRequest>},
+        TContext
+      > => {
+      return useMutation(getRequestLeadUploadUrlMutationOptions(options));
+    }
+
+export const getFinalizeLeadAttachmentUrl = (id: number,) => {
+
+
+
+
+  return `/api/leads/${id}/attachments`
+}
+
+export const finalizeLeadAttachment = async (id: number,
+    attachmentInput: AttachmentInput, options?: Parameters<typeof customFetch>[1]): Promise<LeadAttachment> => {
+
+  return customFetch<LeadAttachment>(getFinalizeLeadAttachmentUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(attachmentInput)
+  }
+);}
+
+
+
+
+
+export const getFinalizeLeadAttachmentMutationOptions = <TError = ErrorType<BadRequestResponse | UnauthorizedResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof finalizeLeadAttachment>>, TError,{id: number;data: BodyType<AttachmentInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof finalizeLeadAttachment>>, TError,{id: number;data: BodyType<AttachmentInput>}, TContext> => {
+
+const mutationKey = ['finalizeLeadAttachment'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof finalizeLeadAttachment>>, {id: number;data: BodyType<AttachmentInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  finalizeLeadAttachment(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type FinalizeLeadAttachmentMutationResult = NonNullable<Awaited<ReturnType<typeof finalizeLeadAttachment>>>
+    export type FinalizeLeadAttachmentMutationBody = BodyType<AttachmentInput>
+    export type FinalizeLeadAttachmentMutationError = ErrorType<BadRequestResponse | UnauthorizedResponse>
+
+    export const useFinalizeLeadAttachment = <TError = ErrorType<BadRequestResponse | UnauthorizedResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof finalizeLeadAttachment>>, TError,{id: number;data: BodyType<AttachmentInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof finalizeLeadAttachment>>,
+        TError,
+        {id: number;data: BodyType<AttachmentInput>},
+        TContext
+      > => {
+      return useMutation(getFinalizeLeadAttachmentMutationOptions(options));
+    }
+
+export const getListRepairLeadsUrl = (params?: ListRepairLeadsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/leads?${stringifiedParams}` : `/api/admin/leads`
+}
+
+export const listRepairLeads = async (params?: ListRepairLeadsParams, options?: Parameters<typeof customFetch>[1]): Promise<RepairLead[]> => {
+
+  return customFetch<RepairLead[]>(getListRepairLeadsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListRepairLeadsQueryKey = (params?: ListRepairLeadsParams,) => {
+    return [
+    `/api/admin/leads`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListRepairLeadsQueryOptions = <TData = Awaited<ReturnType<typeof listRepairLeads>>, TError = ErrorType<UnauthorizedResponse>>(params?: ListRepairLeadsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listRepairLeads>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListRepairLeadsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listRepairLeads>>> = ({ signal }) => listRepairLeads(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listRepairLeads>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListRepairLeadsQueryResult = NonNullable<Awaited<ReturnType<typeof listRepairLeads>>>
+export type ListRepairLeadsQueryError = ErrorType<UnauthorizedResponse>
+
+
+
+export function useListRepairLeads<TData = Awaited<ReturnType<typeof listRepairLeads>>, TError = ErrorType<UnauthorizedResponse>>(
+ params?: ListRepairLeadsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listRepairLeads>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListRepairLeadsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetRepairLeadReportUrl = () => {
+
+
+
+
+  return `/api/admin/leads/report`
+}
+
+export const getRepairLeadReport = async ( options?: Parameters<typeof customFetch>[1]): Promise<LeadReport> => {
+
+  return customFetch<LeadReport>(getGetRepairLeadReportUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetRepairLeadReportQueryKey = () => {
+    return [
+    `/api/admin/leads/report`
+    ] as const;
+    }
+
+
+export const getGetRepairLeadReportQueryOptions = <TData = Awaited<ReturnType<typeof getRepairLeadReport>>, TError = ErrorType<UnauthorizedResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getRepairLeadReport>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetRepairLeadReportQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getRepairLeadReport>>> = ({ signal }) => getRepairLeadReport({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getRepairLeadReport>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetRepairLeadReportQueryResult = NonNullable<Awaited<ReturnType<typeof getRepairLeadReport>>>
+export type GetRepairLeadReportQueryError = ErrorType<UnauthorizedResponse>
+
+
+
+export function useGetRepairLeadReport<TData = Awaited<ReturnType<typeof getRepairLeadReport>>, TError = ErrorType<UnauthorizedResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getRepairLeadReport>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetRepairLeadReportQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetRepairLeadUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/leads/${id}`
+}
+
+export const getRepairLead = async (id: number, options?: Parameters<typeof customFetch>[1]): Promise<RepairLeadDetail> => {
+
+  return customFetch<RepairLeadDetail>(getGetRepairLeadUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetRepairLeadQueryKey = (id: number,) => {
+    return [
+    `/api/admin/leads/${id}`
+    ] as const;
+    }
+
+
+export const getGetRepairLeadQueryOptions = <TData = Awaited<ReturnType<typeof getRepairLead>>, TError = ErrorType<UnauthorizedResponse | NotFoundResponse>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getRepairLead>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetRepairLeadQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getRepairLead>>> = ({ signal }) => getRepairLead(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getRepairLead>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetRepairLeadQueryResult = NonNullable<Awaited<ReturnType<typeof getRepairLead>>>
+export type GetRepairLeadQueryError = ErrorType<UnauthorizedResponse | NotFoundResponse>
+
+
+
+export function useGetRepairLead<TData = Awaited<ReturnType<typeof getRepairLead>>, TError = ErrorType<UnauthorizedResponse | NotFoundResponse>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getRepairLead>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetRepairLeadQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getUpdateRepairLeadUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/leads/${id}`
+}
+
+export const updateRepairLead = async (id: number,
+    leadUpdate: LeadUpdate, options?: Parameters<typeof customFetch>[1]): Promise<RepairLead> => {
+
+  return customFetch<RepairLead>(getUpdateRepairLeadUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(leadUpdate)
+  }
+);}
+
+
+
+
+
+export const getUpdateRepairLeadMutationOptions = <TError = ErrorType<BadRequestResponse | UnauthorizedResponse | NotFoundResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateRepairLead>>, TError,{id: number;data: BodyType<LeadUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateRepairLead>>, TError,{id: number;data: BodyType<LeadUpdate>}, TContext> => {
+
+const mutationKey = ['updateRepairLead'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateRepairLead>>, {id: number;data: BodyType<LeadUpdate>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateRepairLead(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateRepairLeadMutationResult = NonNullable<Awaited<ReturnType<typeof updateRepairLead>>>
+    export type UpdateRepairLeadMutationBody = BodyType<LeadUpdate>
+    export type UpdateRepairLeadMutationError = ErrorType<BadRequestResponse | UnauthorizedResponse | NotFoundResponse>
+
+    export const useUpdateRepairLead = <TError = ErrorType<BadRequestResponse | UnauthorizedResponse | NotFoundResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateRepairLead>>, TError,{id: number;data: BodyType<LeadUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateRepairLead>>,
+        TError,
+        {id: number;data: BodyType<LeadUpdate>},
+        TContext
+      > => {
+      return useMutation(getUpdateRepairLeadMutationOptions(options));
+    }
+
+export const getAddRepairLeadNoteUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/leads/${id}/notes`
+}
+
+export const addRepairLeadNote = async (id: number,
+    leadNoteInput: LeadNoteInput, options?: Parameters<typeof customFetch>[1]): Promise<LeadEvent> => {
+
+  return customFetch<LeadEvent>(getAddRepairLeadNoteUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(leadNoteInput)
+  }
+);}
+
+
+
+
+
+export const getAddRepairLeadNoteMutationOptions = <TError = ErrorType<UnauthorizedResponse | NotFoundResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addRepairLeadNote>>, TError,{id: number;data: BodyType<LeadNoteInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof addRepairLeadNote>>, TError,{id: number;data: BodyType<LeadNoteInput>}, TContext> => {
+
+const mutationKey = ['addRepairLeadNote'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof addRepairLeadNote>>, {id: number;data: BodyType<LeadNoteInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  addRepairLeadNote(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AddRepairLeadNoteMutationResult = NonNullable<Awaited<ReturnType<typeof addRepairLeadNote>>>
+    export type AddRepairLeadNoteMutationBody = BodyType<LeadNoteInput>
+    export type AddRepairLeadNoteMutationError = ErrorType<UnauthorizedResponse | NotFoundResponse>
+
+    export const useAddRepairLeadNote = <TError = ErrorType<UnauthorizedResponse | NotFoundResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addRepairLeadNote>>, TError,{id: number;data: BodyType<LeadNoteInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof addRepairLeadNote>>,
+        TError,
+        {id: number;data: BodyType<LeadNoteInput>},
+        TContext
+      > => {
+      return useMutation(getAddRepairLeadNoteMutationOptions(options));
+    }
+
+export const getDownloadRepairLeadAttachmentUrl = (id: number,
+    attachmentId: number,) => {
+
+
+
+
+  return `/api/admin/leads/${id}/attachments/${attachmentId}`
+}
+
+export const downloadRepairLeadAttachment = async (id: number,
+    attachmentId: number, options?: Parameters<typeof customFetch>[1]): Promise<Blob> => {
+
+  return customFetch<Blob>(getDownloadRepairLeadAttachmentUrl(id,attachmentId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getDownloadRepairLeadAttachmentQueryKey = (id: number,
+    attachmentId: number,) => {
+    return [
+    `/api/admin/leads/${id}/attachments/${attachmentId}`
+    ] as const;
+    }
+
+
+export const getDownloadRepairLeadAttachmentQueryOptions = <TData = Awaited<ReturnType<typeof downloadRepairLeadAttachment>>, TError = ErrorType<UnauthorizedResponse | NotFoundResponse>>(id: number,
+    attachmentId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof downloadRepairLeadAttachment>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDownloadRepairLeadAttachmentQueryKey(id,attachmentId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof downloadRepairLeadAttachment>>> = ({ signal }) => downloadRepairLeadAttachment(id,attachmentId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined && attachmentId !== null && attachmentId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof downloadRepairLeadAttachment>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type DownloadRepairLeadAttachmentQueryResult = NonNullable<Awaited<ReturnType<typeof downloadRepairLeadAttachment>>>
+export type DownloadRepairLeadAttachmentQueryError = ErrorType<UnauthorizedResponse | NotFoundResponse>
+
+
+
+export function useDownloadRepairLeadAttachment<TData = Awaited<ReturnType<typeof downloadRepairLeadAttachment>>, TError = ErrorType<UnauthorizedResponse | NotFoundResponse>>(
+ id: number,
+    attachmentId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof downloadRepairLeadAttachment>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getDownloadRepairLeadAttachmentQueryOptions(id,attachmentId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getListFollowUpsUrl = (params?: ListFollowUpsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/follow-ups?${stringifiedParams}` : `/api/admin/follow-ups`
+}
+
+export const listFollowUps = async (params?: ListFollowUpsParams, options?: Parameters<typeof customFetch>[1]): Promise<FollowUpTask[]> => {
+
+  return customFetch<FollowUpTask[]>(getListFollowUpsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListFollowUpsQueryKey = (params?: ListFollowUpsParams,) => {
+    return [
+    `/api/admin/follow-ups`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListFollowUpsQueryOptions = <TData = Awaited<ReturnType<typeof listFollowUps>>, TError = ErrorType<UnauthorizedResponse>>(params?: ListFollowUpsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listFollowUps>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListFollowUpsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listFollowUps>>> = ({ signal }) => listFollowUps(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listFollowUps>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListFollowUpsQueryResult = NonNullable<Awaited<ReturnType<typeof listFollowUps>>>
+export type ListFollowUpsQueryError = ErrorType<UnauthorizedResponse>
+
+
+
+export function useListFollowUps<TData = Awaited<ReturnType<typeof listFollowUps>>, TError = ErrorType<UnauthorizedResponse>>(
+ params?: ListFollowUpsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listFollowUps>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListFollowUpsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getUpdateFollowUpUrl = (id: number,) => {
+
+
+
+
+  return `/api/admin/follow-ups/${id}`
+}
+
+export const updateFollowUp = async (id: number,
+    followUpUpdate: FollowUpUpdate, options?: Parameters<typeof customFetch>[1]): Promise<FollowUpTask> => {
+
+  return customFetch<FollowUpTask>(getUpdateFollowUpUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(followUpUpdate)
+  }
+);}
+
+
+
+
+
+export const getUpdateFollowUpMutationOptions = <TError = ErrorType<UnauthorizedResponse | NotFoundResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateFollowUp>>, TError,{id: number;data: BodyType<FollowUpUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateFollowUp>>, TError,{id: number;data: BodyType<FollowUpUpdate>}, TContext> => {
+
+const mutationKey = ['updateFollowUp'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateFollowUp>>, {id: number;data: BodyType<FollowUpUpdate>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateFollowUp(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateFollowUpMutationResult = NonNullable<Awaited<ReturnType<typeof updateFollowUp>>>
+    export type UpdateFollowUpMutationBody = BodyType<FollowUpUpdate>
+    export type UpdateFollowUpMutationError = ErrorType<UnauthorizedResponse | NotFoundResponse>
+
+    export const useUpdateFollowUp = <TError = ErrorType<UnauthorizedResponse | NotFoundResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateFollowUp>>, TError,{id: number;data: BodyType<FollowUpUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateFollowUp>>,
+        TError,
+        {id: number;data: BodyType<FollowUpUpdate>},
+        TContext
+      > => {
+      return useMutation(getUpdateFollowUpMutationOptions(options));
+    }
 

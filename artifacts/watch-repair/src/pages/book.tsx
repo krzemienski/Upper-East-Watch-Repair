@@ -186,6 +186,12 @@ export default function BookPage() {
         </div>
 
         <div className="mt-10 flex flex-wrap items-center gap-4">
+          <Link href="/repair/intake">
+            <Button data-testid="button-book-intake">
+              Start repair intake
+              <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
+          </Link>
           <Link href="/services/watch-repair">
             <Button variant="outline" data-testid="button-book-services">
               Review our services

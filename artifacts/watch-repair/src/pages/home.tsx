@@ -24,6 +24,7 @@ import { WatchPoster } from '@/components/WatchPoster';
 import { Section, SectionHeading } from '@/components/Section';
 import { services } from '@/data/services';
 import { testimonials } from '@/data/testimonials';
+import { MAPS_URL } from '@/data/business';
 
 const serviceIcons = [Watch, BatteryCharging, Gem];
 
@@ -76,9 +77,9 @@ export default function HomePage() {
               with the care your timepiece deserves.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
-              <Link href="/book">
+              <Link href="/repair/intake">
                 <Button size="lg" data-testid="button-hero-book">
-                  Book an Appointment
+                  Start a Repair Request
                   <ArrowRight className="h-4 w-4 ml-1" />
                 </Button>
               </Link>
@@ -191,9 +192,9 @@ export default function HomePage() {
               ))}
             </ol>
             <div className="mt-8">
-              <Link href="/book">
+              <Link href="/repair/intake">
                 <Button data-testid="button-process-book">
-                  Reserve a time
+                  Tell us about your watch
                   <ArrowRight className="h-4 w-4 ml-1" />
                 </Button>
               </Link>
@@ -267,13 +268,13 @@ export default function HomePage() {
               233 East 84th Street, ready when you are.
             </p>
             <div className="mt-8 flex flex-wrap gap-3 justify-center">
-              <Link href="/book">
+              <Link href="/repair/intake">
                 <Button size="lg" data-testid="button-cta-book">
-                  Book an Appointment
+                  Start Repair Intake
                 </Button>
               </Link>
               <a
-                href="https://maps.google.com/?q=233+East+84th+Street+New+York+NY"
+                href={MAPS_URL}
                 target="_blank"
                 rel="noopener noreferrer"
               >

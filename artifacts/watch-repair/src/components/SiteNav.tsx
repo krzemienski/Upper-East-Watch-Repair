@@ -7,6 +7,7 @@ import { Logo } from '@/components/Logo';
 
 const navLinks = [
   { href: '/', label: 'Home' },
+  { href: '/repair', label: 'Start a Repair' },
   { href: '/services/watch-repair', label: 'Watch Repair' },
   { href: '/services/battery-replacement', label: 'Battery' },
   { href: '/services/jewelry-repair', label: 'Jewelry' },
@@ -53,9 +54,9 @@ export function SiteNav() {
 
         {/* CTA */}
         <div className="hidden md:flex items-center gap-3">
-          <Link href="/book">
+          <Link href="/repair/intake">
             <Button size="sm" data-testid="nav-book-appointment">
-              Book Appointment
+              Repair Intake
             </Button>
           </Link>
         </div>
@@ -98,9 +99,9 @@ export function SiteNav() {
               );
             })}
             <li className="pt-2">
-              <Link href="/book" onClick={() => setMobileOpen(false)}>
+              <Link href="/repair/intake" onClick={() => setMobileOpen(false)}>
                 <Button className="w-full" data-testid="mobile-nav-book">
-                  Book Appointment
+                  Start Repair Intake
                 </Button>
               </Link>
             </li>

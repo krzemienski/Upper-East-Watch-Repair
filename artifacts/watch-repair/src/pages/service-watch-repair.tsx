@@ -159,9 +159,9 @@ export default function ServiceWatchRepairPage() {
             Book a time or walk in during shop hours at 233 East 84th Street.
           </p>
           <div className="mt-8 flex flex-wrap gap-3 justify-center">
-            <Link href="/book">
+            <Link href="/repair/intake">
               <Button size="lg" data-testid="button-watch-book">
-                Book an Appointment
+                Start a Repair Request
                 <ArrowRight className="h-4 w-4 ml-1" />
               </Button>
             </Link>

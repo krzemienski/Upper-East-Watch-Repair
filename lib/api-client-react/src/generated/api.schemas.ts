@@ -5,6 +5,311 @@
  * Upper East Watch Repair API
  * OpenAPI spec version: 0.1.0
  */
+export type LeadStatus = typeof LeadStatus[keyof typeof LeadStatus];
+
+
+export const LeadStatus = {
+  new: 'new',
+  contacted: 'contacted',
+  visit_planned: 'visit_planned',
+  watch_received: 'watch_received',
+  estimate_pending: 'estimate_pending',
+  won: 'won',
+  lost: 'lost',
+} as const;
+
+export interface Attribution {
+  /** @maxLength 255 */
+  utmSource?: string;
+  /** @maxLength 255 */
+  utmMedium?: string;
+  /** @maxLength 255 */
+  utmCampaign?: string;
+  /** @maxLength 255 */
+  utmTerm?: string;
+  /** @maxLength 255 */
+  utmContent?: string;
+  /** @maxLength 2000 */
+  referrer?: string;
+  /** @maxLength 255 */
+  source?: string;
+  /** @maxLength 120 */
+  variant?: string;
+  /** @maxLength 80 */
+  device?: string;
+  /** @maxLength 160 */
+  selectedCta?: string;
+}
+
+export type FunnelEventInputMetadata = { [key: string]: unknown };
+
+export type FunnelEventInput = Attribution & {
+  /**
+     * @minLength 1
+     * @maxLength 80
+     */
+  event: string;
+  /** @maxLength 255 */
+  sessionId?: string;
+  leadId?: number;
+  metadata?: FunnelEventInputMetadata;
+};
+
+export type FunnelEvent = FunnelEventInput & {
+  id: number;
+  createdAt: string;
+};
+
+export type LeadInputPreferredChannel = typeof LeadInputPreferredChannel[keyof typeof LeadInputPreferredChannel];
+
+
+export const LeadInputPreferredChannel = {
+  email: 'email',
+  phone: 'phone',
+  sms: 'sms',
+  none: 'none',
+} as const;
+
+export type LeadInputIntakeMode = typeof LeadInputIntakeMode[keyof typeof LeadInputIntakeMode];
+
+
+export const LeadInputIntakeMode = {
+  mail_in: 'mail_in',
+  in_store: 'in_store',
+  unsure: 'unsure',
+} as const;
+
+export type LeadInput = Attribution & {
+  /**
+     * @minLength 1
+     * @maxLength 160
+     */
+  name: string;
+  /** @maxLength 320 */
+  email?: string;
+  /**
+     * @minLength 5
+     * @maxLength 40
+     */
+  phone?: string;
+  preferredChannel?: LeadInputPreferredChannel;
+  emailConsent?: boolean;
+  phoneConsent?: boolean;
+  smsConsent?: boolean;
+  /** @maxLength 120 */
+  serviceNeeded?: string;
+  /** @maxLength 120 */
+  watchBrand?: string;
+  /** @maxLength 120 */
+  watchModel?: string;
+  /**
+     * @minLength 1
+     * @maxLength 5000
+     */
+  description: string;
+  intakeMode?: LeadInputIntakeMode;
+};
+
+export type RepairLead = LeadInput & ({
+  id: number;
+  status: LeadStatus;
+  /** @nullable */
+  adminOwner?: string | null;
+  /** @nullable */
+  adminSummary?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}) & Required<Pick<LeadInput & ({
+  id: number;
+  status: LeadStatus;
+  /** @nullable */
+  adminOwner?: string | null;
+  /** @nullable */
+  adminSummary?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}), 'preferredChannel' | 'emailConsent' | 'phoneConsent' | 'smsConsent' | 'intakeMode'>>;
+
+export interface LeadCreated {
+  lead: RepairLead;
+  uploadToken: string;
+  uploadTokenExpiresAt: string;
+}
+
+export type UploadRequestContentType = typeof UploadRequestContentType[keyof typeof UploadRequestContentType];
+
+
+export const UploadRequestContentType = {
+  'image/jpeg': 'image/jpeg',
+  'image/png': 'image/png',
+  'image/webp': 'image/webp',
+} as const;
+
+export interface UploadRequest {
+  /**
+     * @minLength 1
+     * @maxLength 255
+     */
+  name: string;
+  /**
+     * @minimum 1
+     * @maximum 8388608
+     */
+  size: number;
+  contentType: UploadRequestContentType;
+}
+
+export interface UploadTarget {
+  uploadURL: string;
+  objectPath: string;
+}
+
+export type AttachmentInput = UploadRequest & {
+  /** @pattern ^/objects/repair-leads/[1-9][0-9]*\/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$ */
+  objectPath: string;
+};
+
+export interface LeadAttachment {
+  id: number;
+  leadId: number;
+  objectPath: string;
+  originalName: string;
+  contentType: string;
+  size: number;
+  createdAt: string;
+}
+
+/**
+ * @nullable
+ */
+export type LeadEventMetadata = { [key: string]: unknown } | null;
+
+export interface LeadEvent {
+  id: number;
+  leadId: number;
+  type: string;
+  /** @nullable */
+  note?: string | null;
+  /** @nullable */
+  fromStatus?: string | null;
+  /** @nullable */
+  toStatus?: string | null;
+  /** @nullable */
+  actorUserId?: string | null;
+  /** @nullable */
+  metadata?: LeadEventMetadata;
+  createdAt: string;
+}
+
+export type FollowUpTaskChannel = typeof FollowUpTaskChannel[keyof typeof FollowUpTaskChannel];
+
+
+export const FollowUpTaskChannel = {
+  email: 'email',
+  phone: 'phone',
+  sms: 'sms',
+} as const;
+
+export type FollowUpTaskStatus = typeof FollowUpTaskStatus[keyof typeof FollowUpTaskStatus];
+
+
+export const FollowUpTaskStatus = {
+  pending: 'pending',
+  completed: 'completed',
+  cancelled: 'cancelled',
+} as const;
+
+export interface FollowUpTask {
+  id: number;
+  leadId: number;
+  channel: FollowUpTaskChannel;
+  status: FollowUpTaskStatus;
+  dueAt: string;
+  /** @nullable */
+  completedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RepairLeadDetail {
+  lead: RepairLead;
+  attachments: LeadAttachment[];
+  events: LeadEvent[];
+  followUps: FollowUpTask[];
+}
+
+export interface LeadUpdate {
+  status?: LeadStatus;
+  /**
+     * @maxLength 160
+     * @nullable
+     */
+  adminOwner?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  adminSummary?: string | null;
+}
+
+export interface LeadNoteInput {
+  /**
+     * @minLength 1
+     * @maxLength 5000
+     */
+  note: string;
+}
+
+export type FollowUpUpdateStatus = typeof FollowUpUpdateStatus[keyof typeof FollowUpUpdateStatus];
+
+
+export const FollowUpUpdateStatus = {
+  pending: 'pending',
+  completed: 'completed',
+  cancelled: 'cancelled',
+} as const;
+
+export interface FollowUpUpdate {
+  status?: FollowUpUpdateStatus;
+  dueAt?: string;
+}
+
+export type LeadReportByStatus = {[key: string]: number};
+
+export type LeadReportBySource = {[key: string]: number};
+
+export type LeadReportByCampaign = {[key: string]: number};
+
+export type LeadReportByVariant = {[key: string]: number};
+
+export type LeadReportByServiceNeeded = {[key: string]: number};
+
+export type LeadReportMetrics = {
+  callClicks: number;
+  directionsClicks: number;
+  intakeSubmissions: number;
+  watchesReceived: number;
+  wonRepairs: number;
+};
+
+export type LeadReportStageConversionPercentages = {
+  intakeToWatchReceived: number;
+  watchReceivedToWon: number;
+  intakeToWon: number;
+};
+
+export interface LeadReport {
+  total: number;
+  byStatus: LeadReportByStatus;
+  bySource: LeadReportBySource;
+  byCampaign: LeadReportByCampaign;
+  byVariant: LeadReportByVariant;
+  byServiceNeeded: LeadReportByServiceNeeded;
+  metrics: LeadReportMetrics;
+  stageConversionPercentages: LeadReportStageConversionPercentages;
+  conversionRate: number;
+}
+
 export interface HealthStatus {
   status: string;
 }
@@ -124,6 +429,23 @@ export interface ErrorEnvelope {
   error: string;
 }
 
+/**
+ * Invalid request
+ */
+export type BadRequestResponse = ErrorEnvelope;
+
+/**
+ * Unauthorized
+ */
+export type UnauthorizedResponse = ErrorEnvelope;
+
+/**
+ * Not found
+ */
+export type NotFoundResponse = ErrorEnvelope;
+
+export type UploadTokenParameter = string;
+
 export type AuthorizationSessionHeaderParameter = string;
 
 export type BeginBrowserLoginParams = {
@@ -133,4 +455,35 @@ returnTo?: string;
 export type LogoutBrowserSessionParams = {
 returnTo?: string;
 };
+
+export type ListRepairLeadsParams = {
+status?: LeadStatus;
+search?: string;
+source?: string;
+from?: string;
+to?: string;
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+limit?: number;
+/**
+ * @minimum 0
+ */
+offset?: number;
+};
+
+export type ListFollowUpsParams = {
+status?: ListFollowUpsStatus;
+dueBefore?: string;
+};
+
+export type ListFollowUpsStatus = typeof ListFollowUpsStatus[keyof typeof ListFollowUpsStatus];
+
+
+export const ListFollowUpsStatus = {
+  pending: 'pending',
+  completed: 'completed',
+  cancelled: 'cancelled',
+} as const;
 

@@ -9,7 +9,7 @@ export const POSTAL_CODE = '10028';
 export const ADDRESS_SINGLE_LINE =
   `${STREET_ADDRESS}, ${ADDRESS_LOCALITY}, ${ADDRESS_REGION} ${POSTAL_CODE}`;
 export const MAPS_URL =
-  'https://maps.google.com/?q=233+East+84th+Street+New+York+NY';
+  'https://maps.app.goo.gl/ZsbqnKudQrDjQrGn8?g_st=ic';
 
 // TODO(hours): client must confirm exact hours before launch.
 export const HOURS_DISPLAY = [

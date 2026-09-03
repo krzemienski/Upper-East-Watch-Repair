@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'wouter';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -255,6 +256,11 @@ function AdminEditor({ userName, onLogout }: { userName: string; onLogout: () =>
             </p>
           </div>
           <div className="flex items-center gap-3">
+            <Link href="/admin/leads">
+              <Button variant="outline" data-testid="button-repair-leads">
+                Repair leads
+              </Button>
+            </Link>
             <Button
               onClick={() => setSelectedId('new')}
               data-testid="button-new-guide"

@@ -224,3 +224,706 @@ export const LogoutBrowserSessionHeader = zod.object({
 export const LogoutBrowserSessionResponse = zod.void()
 
 
+/**
+ * @summary Record a public funnel interaction
+ */
+export const createFunnelEventBodyOneUtmSourceMax = 255;
+
+export const createFunnelEventBodyOneUtmMediumMax = 255;
+
+export const createFunnelEventBodyOneUtmCampaignMax = 255;
+
+export const createFunnelEventBodyOneUtmTermMax = 255;
+
+export const createFunnelEventBodyOneUtmContentMax = 255;
+
+export const createFunnelEventBodyOneReferrerMax = 2000;
+
+export const createFunnelEventBodyOneSourceMax = 255;
+
+export const createFunnelEventBodyOneVariantMax = 120;
+
+export const createFunnelEventBodyOneDeviceMax = 80;
+
+export const createFunnelEventBodyOneSelectedCtaMax = 160;
+
+export const createFunnelEventBodyTwoEventMax = 80;
+
+export const createFunnelEventBodyTwoSessionIdMax = 255;
+
+
+
+export const CreateFunnelEventBody = zod.object({
+  "utmSource": zod.string().max(createFunnelEventBodyOneUtmSourceMax).optional(),
+  "utmMedium": zod.string().max(createFunnelEventBodyOneUtmMediumMax).optional(),
+  "utmCampaign": zod.string().max(createFunnelEventBodyOneUtmCampaignMax).optional(),
+  "utmTerm": zod.string().max(createFunnelEventBodyOneUtmTermMax).optional(),
+  "utmContent": zod.string().max(createFunnelEventBodyOneUtmContentMax).optional(),
+  "referrer": zod.string().max(createFunnelEventBodyOneReferrerMax).optional(),
+  "source": zod.string().max(createFunnelEventBodyOneSourceMax).optional(),
+  "variant": zod.string().max(createFunnelEventBodyOneVariantMax).optional(),
+  "device": zod.string().max(createFunnelEventBodyOneDeviceMax).optional(),
+  "selectedCta": zod.string().max(createFunnelEventBodyOneSelectedCtaMax).optional()
+}).and(zod.object({
+  "event": zod.string().min(1).max(createFunnelEventBodyTwoEventMax),
+  "sessionId": zod.string().max(createFunnelEventBodyTwoSessionIdMax).optional(),
+  "leadId": zod.int().optional(),
+  "metadata": zod.record(zod.string(), zod.unknown()).optional()
+}))
+
+export const createFunnelEventResponseOneOneUtmSourceMax = 255;
+
+export const createFunnelEventResponseOneOneUtmMediumMax = 255;
+
+export const createFunnelEventResponseOneOneUtmCampaignMax = 255;
+
+export const createFunnelEventResponseOneOneUtmTermMax = 255;
+
+export const createFunnelEventResponseOneOneUtmContentMax = 255;
+
+export const createFunnelEventResponseOneOneReferrerMax = 2000;
+
+export const createFunnelEventResponseOneOneSourceMax = 255;
+
+export const createFunnelEventResponseOneOneVariantMax = 120;
+
+export const createFunnelEventResponseOneOneDeviceMax = 80;
+
+export const createFunnelEventResponseOneOneSelectedCtaMax = 160;
+
+export const createFunnelEventResponseOneTwoEventMax = 80;
+
+export const createFunnelEventResponseOneTwoSessionIdMax = 255;
+
+
+
+export const CreateFunnelEventResponse = zod.object({
+  "utmSource": zod.string().max(createFunnelEventResponseOneOneUtmSourceMax).optional(),
+  "utmMedium": zod.string().max(createFunnelEventResponseOneOneUtmMediumMax).optional(),
+  "utmCampaign": zod.string().max(createFunnelEventResponseOneOneUtmCampaignMax).optional(),
+  "utmTerm": zod.string().max(createFunnelEventResponseOneOneUtmTermMax).optional(),
+  "utmContent": zod.string().max(createFunnelEventResponseOneOneUtmContentMax).optional(),
+  "referrer": zod.string().max(createFunnelEventResponseOneOneReferrerMax).optional(),
+  "source": zod.string().max(createFunnelEventResponseOneOneSourceMax).optional(),
+  "variant": zod.string().max(createFunnelEventResponseOneOneVariantMax).optional(),
+  "device": zod.string().max(createFunnelEventResponseOneOneDeviceMax).optional(),
+  "selectedCta": zod.string().max(createFunnelEventResponseOneOneSelectedCtaMax).optional()
+}).and(zod.object({
+  "event": zod.string().min(1).max(createFunnelEventResponseOneTwoEventMax),
+  "sessionId": zod.string().max(createFunnelEventResponseOneTwoSessionIdMax).optional(),
+  "leadId": zod.int().optional(),
+  "metadata": zod.record(zod.string(), zod.unknown()).optional()
+})).and(zod.object({
+  "id": zod.int(),
+  "createdAt": zod.coerce.date()
+}))
+
+
+/**
+ * @summary Submit a repair lead
+ */
+export const createRepairLeadBodyOneUtmSourceMax = 255;
+
+export const createRepairLeadBodyOneUtmMediumMax = 255;
+
+export const createRepairLeadBodyOneUtmCampaignMax = 255;
+
+export const createRepairLeadBodyOneUtmTermMax = 255;
+
+export const createRepairLeadBodyOneUtmContentMax = 255;
+
+export const createRepairLeadBodyOneReferrerMax = 2000;
+
+export const createRepairLeadBodyOneSourceMax = 255;
+
+export const createRepairLeadBodyOneVariantMax = 120;
+
+export const createRepairLeadBodyOneDeviceMax = 80;
+
+export const createRepairLeadBodyOneSelectedCtaMax = 160;
+
+export const createRepairLeadBodyTwoNameMax = 160;
+
+export const createRepairLeadBodyTwoEmailMax = 320;
+
+export const createRepairLeadBodyTwoPhoneMin = 5;
+export const createRepairLeadBodyTwoPhoneMax = 40;
+
+export const createRepairLeadBodyTwoPreferredChannelDefault = `none`;
+export const createRepairLeadBodyTwoEmailConsentDefault = false;
+export const createRepairLeadBodyTwoPhoneConsentDefault = false;
+export const createRepairLeadBodyTwoSmsConsentDefault = false;
+export const createRepairLeadBodyTwoServiceNeededMax = 120;
+
+export const createRepairLeadBodyTwoWatchBrandMax = 120;
+
+export const createRepairLeadBodyTwoWatchModelMax = 120;
+
+export const createRepairLeadBodyTwoDescriptionMax = 5000;
+
+export const createRepairLeadBodyTwoIntakeModeDefault = `unsure`;
+
+export const CreateRepairLeadBody = zod.object({
+  "utmSource": zod.string().max(createRepairLeadBodyOneUtmSourceMax).optional(),
+  "utmMedium": zod.string().max(createRepairLeadBodyOneUtmMediumMax).optional(),
+  "utmCampaign": zod.string().max(createRepairLeadBodyOneUtmCampaignMax).optional(),
+  "utmTerm": zod.string().max(createRepairLeadBodyOneUtmTermMax).optional(),
+  "utmContent": zod.string().max(createRepairLeadBodyOneUtmContentMax).optional(),
+  "referrer": zod.string().max(createRepairLeadBodyOneReferrerMax).optional(),
+  "source": zod.string().max(createRepairLeadBodyOneSourceMax).optional(),
+  "variant": zod.string().max(createRepairLeadBodyOneVariantMax).optional(),
+  "device": zod.string().max(createRepairLeadBodyOneDeviceMax).optional(),
+  "selectedCta": zod.string().max(createRepairLeadBodyOneSelectedCtaMax).optional()
+}).and(zod.object({
+  "name": zod.string().min(1).max(createRepairLeadBodyTwoNameMax),
+  "email": zod.email().max(createRepairLeadBodyTwoEmailMax).optional(),
+  "phone": zod.string().min(createRepairLeadBodyTwoPhoneMin).max(createRepairLeadBodyTwoPhoneMax).optional(),
+  "preferredChannel": zod.enum(['email', 'phone', 'sms', 'none']).default(createRepairLeadBodyTwoPreferredChannelDefault),
+  "emailConsent": zod.boolean().default(createRepairLeadBodyTwoEmailConsentDefault),
+  "phoneConsent": zod.boolean().default(createRepairLeadBodyTwoPhoneConsentDefault),
+  "smsConsent": zod.boolean().default(createRepairLeadBodyTwoSmsConsentDefault),
+  "serviceNeeded": zod.string().max(createRepairLeadBodyTwoServiceNeededMax).optional(),
+  "watchBrand": zod.string().max(createRepairLeadBodyTwoWatchBrandMax).optional(),
+  "watchModel": zod.string().max(createRepairLeadBodyTwoWatchModelMax).optional(),
+  "description": zod.string().min(1).max(createRepairLeadBodyTwoDescriptionMax),
+  "intakeMode": zod.enum(['mail_in', 'in_store', 'unsure']).default(createRepairLeadBodyTwoIntakeModeDefault)
+}))
+
+export const createRepairLeadResponseLeadOneOneUtmSourceMax = 255;
+
+export const createRepairLeadResponseLeadOneOneUtmMediumMax = 255;
+
+export const createRepairLeadResponseLeadOneOneUtmCampaignMax = 255;
+
+export const createRepairLeadResponseLeadOneOneUtmTermMax = 255;
+
+export const createRepairLeadResponseLeadOneOneUtmContentMax = 255;
+
+export const createRepairLeadResponseLeadOneOneReferrerMax = 2000;
+
+export const createRepairLeadResponseLeadOneOneSourceMax = 255;
+
+export const createRepairLeadResponseLeadOneOneVariantMax = 120;
+
+export const createRepairLeadResponseLeadOneOneDeviceMax = 80;
+
+export const createRepairLeadResponseLeadOneOneSelectedCtaMax = 160;
+
+export const createRepairLeadResponseLeadOneTwoNameMax = 160;
+
+export const createRepairLeadResponseLeadOneTwoEmailMax = 320;
+
+export const createRepairLeadResponseLeadOneTwoPhoneMin = 5;
+export const createRepairLeadResponseLeadOneTwoPhoneMax = 40;
+
+export const createRepairLeadResponseLeadOneTwoPreferredChannelDefault = `none`;
+export const createRepairLeadResponseLeadOneTwoEmailConsentDefault = false;
+export const createRepairLeadResponseLeadOneTwoPhoneConsentDefault = false;
+export const createRepairLeadResponseLeadOneTwoSmsConsentDefault = false;
+export const createRepairLeadResponseLeadOneTwoServiceNeededMax = 120;
+
+export const createRepairLeadResponseLeadOneTwoWatchBrandMax = 120;
+
+export const createRepairLeadResponseLeadOneTwoWatchModelMax = 120;
+
+export const createRepairLeadResponseLeadOneTwoDescriptionMax = 5000;
+
+export const createRepairLeadResponseLeadOneTwoIntakeModeDefault = `unsure`;
+
+export const CreateRepairLeadResponse = zod.object({
+  "lead": zod.object({
+  "utmSource": zod.string().max(createRepairLeadResponseLeadOneOneUtmSourceMax).optional(),
+  "utmMedium": zod.string().max(createRepairLeadResponseLeadOneOneUtmMediumMax).optional(),
+  "utmCampaign": zod.string().max(createRepairLeadResponseLeadOneOneUtmCampaignMax).optional(),
+  "utmTerm": zod.string().max(createRepairLeadResponseLeadOneOneUtmTermMax).optional(),
+  "utmContent": zod.string().max(createRepairLeadResponseLeadOneOneUtmContentMax).optional(),
+  "referrer": zod.string().max(createRepairLeadResponseLeadOneOneReferrerMax).optional(),
+  "source": zod.string().max(createRepairLeadResponseLeadOneOneSourceMax).optional(),
+  "variant": zod.string().max(createRepairLeadResponseLeadOneOneVariantMax).optional(),
+  "device": zod.string().max(createRepairLeadResponseLeadOneOneDeviceMax).optional(),
+  "selectedCta": zod.string().max(createRepairLeadResponseLeadOneOneSelectedCtaMax).optional()
+}).and(zod.object({
+  "name": zod.string().min(1).max(createRepairLeadResponseLeadOneTwoNameMax),
+  "email": zod.email().max(createRepairLeadResponseLeadOneTwoEmailMax).optional(),
+  "phone": zod.string().min(createRepairLeadResponseLeadOneTwoPhoneMin).max(createRepairLeadResponseLeadOneTwoPhoneMax).optional(),
+  "preferredChannel": zod.enum(['email', 'phone', 'sms', 'none']).default(createRepairLeadResponseLeadOneTwoPreferredChannelDefault),
+  "emailConsent": zod.boolean().default(createRepairLeadResponseLeadOneTwoEmailConsentDefault),
+  "phoneConsent": zod.boolean().default(createRepairLeadResponseLeadOneTwoPhoneConsentDefault),
+  "smsConsent": zod.boolean().default(createRepairLeadResponseLeadOneTwoSmsConsentDefault),
+  "serviceNeeded": zod.string().max(createRepairLeadResponseLeadOneTwoServiceNeededMax).optional(),
+  "watchBrand": zod.string().max(createRepairLeadResponseLeadOneTwoWatchBrandMax).optional(),
+  "watchModel": zod.string().max(createRepairLeadResponseLeadOneTwoWatchModelMax).optional(),
+  "description": zod.string().min(1).max(createRepairLeadResponseLeadOneTwoDescriptionMax),
+  "intakeMode": zod.enum(['mail_in', 'in_store', 'unsure']).default(createRepairLeadResponseLeadOneTwoIntakeModeDefault)
+})).and(zod.object({
+  "id": zod.int(),
+  "status": zod.enum(['new', 'contacted', 'visit_planned', 'watch_received', 'estimate_pending', 'won', 'lost']),
+  "adminOwner": zod.string().nullish(),
+  "adminSummary": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})),
+  "uploadToken": zod.string(),
+  "uploadTokenExpiresAt": zod.coerce.date()
+})
+
+
+export const RequestLeadUploadUrlParams = zod.object({
+  "id": zod.coerce.number().int()
+})
+
+export const requestLeadUploadUrlHeaderXLeadUploadTokenMin = 32;
+
+
+
+export const RequestLeadUploadUrlHeader = zod.object({
+  "X-Lead-Upload-Token": zod.string().min(requestLeadUploadUrlHeaderXLeadUploadTokenMin)
+})
+
+export const requestLeadUploadUrlBodyNameMax = 255;
+
+export const requestLeadUploadUrlBodySizeMax = 8388608;
+
+
+
+export const RequestLeadUploadUrlBody = zod.object({
+  "name": zod.string().min(1).max(requestLeadUploadUrlBodyNameMax),
+  "size": zod.int().min(1).max(requestLeadUploadUrlBodySizeMax),
+  "contentType": zod.enum(['image/jpeg', 'image/png', 'image/webp'])
+})
+
+export const RequestLeadUploadUrlResponse = zod.object({
+  "uploadURL": zod.url(),
+  "objectPath": zod.string()
+})
+
+
+export const FinalizeLeadAttachmentParams = zod.object({
+  "id": zod.coerce.number().int()
+})
+
+export const finalizeLeadAttachmentHeaderXLeadUploadTokenMin = 32;
+
+
+
+export const FinalizeLeadAttachmentHeader = zod.object({
+  "X-Lead-Upload-Token": zod.string().min(finalizeLeadAttachmentHeaderXLeadUploadTokenMin)
+})
+
+export const finalizeLeadAttachmentBodyOneNameMax = 255;
+
+export const finalizeLeadAttachmentBodyOneSizeMax = 8388608;
+
+export const finalizeLeadAttachmentBodyTwoObjectPathRegExp = new RegExp('^/objects/repair-leads/[1-9][0-9]*/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$');
+
+
+export const FinalizeLeadAttachmentBody = zod.object({
+  "name": zod.string().min(1).max(finalizeLeadAttachmentBodyOneNameMax),
+  "size": zod.int().min(1).max(finalizeLeadAttachmentBodyOneSizeMax),
+  "contentType": zod.enum(['image/jpeg', 'image/png', 'image/webp'])
+}).and(zod.object({
+  "objectPath": zod.string().regex(finalizeLeadAttachmentBodyTwoObjectPathRegExp)
+}))
+
+export const FinalizeLeadAttachmentResponse = zod.object({
+  "id": zod.int(),
+  "leadId": zod.int(),
+  "objectPath": zod.string(),
+  "originalName": zod.string(),
+  "contentType": zod.string(),
+  "size": zod.int(),
+  "createdAt": zod.coerce.date()
+})
+
+
+export const listRepairLeadsQueryLimitDefault = 50;
+export const listRepairLeadsQueryLimitMax = 100;
+
+export const listRepairLeadsQueryOffsetDefault = 0;
+export const listRepairLeadsQueryOffsetMin = 0;
+
+
+
+export const ListRepairLeadsQueryParams = zod.object({
+  "status": zod.enum(['new', 'contacted', 'visit_planned', 'watch_received', 'estimate_pending', 'won', 'lost']).optional(),
+  "search": zod.coerce.string().optional(),
+  "source": zod.coerce.string().optional(),
+  "from": zod.date().optional(),
+  "to": zod.date().optional(),
+  "limit": zod.coerce.number().int().min(1).max(listRepairLeadsQueryLimitMax).default(listRepairLeadsQueryLimitDefault),
+  "offset": zod.coerce.number().int().min(listRepairLeadsQueryOffsetMin).default(listRepairLeadsQueryOffsetDefault)
+})
+
+export const listRepairLeadsResponseOneOneUtmSourceMax = 255;
+
+export const listRepairLeadsResponseOneOneUtmMediumMax = 255;
+
+export const listRepairLeadsResponseOneOneUtmCampaignMax = 255;
+
+export const listRepairLeadsResponseOneOneUtmTermMax = 255;
+
+export const listRepairLeadsResponseOneOneUtmContentMax = 255;
+
+export const listRepairLeadsResponseOneOneReferrerMax = 2000;
+
+export const listRepairLeadsResponseOneOneSourceMax = 255;
+
+export const listRepairLeadsResponseOneOneVariantMax = 120;
+
+export const listRepairLeadsResponseOneOneDeviceMax = 80;
+
+export const listRepairLeadsResponseOneOneSelectedCtaMax = 160;
+
+export const listRepairLeadsResponseOneTwoNameMax = 160;
+
+export const listRepairLeadsResponseOneTwoEmailMax = 320;
+
+export const listRepairLeadsResponseOneTwoPhoneMin = 5;
+export const listRepairLeadsResponseOneTwoPhoneMax = 40;
+
+export const listRepairLeadsResponseOneTwoPreferredChannelDefault = `none`;
+export const listRepairLeadsResponseOneTwoEmailConsentDefault = false;
+export const listRepairLeadsResponseOneTwoPhoneConsentDefault = false;
+export const listRepairLeadsResponseOneTwoSmsConsentDefault = false;
+export const listRepairLeadsResponseOneTwoServiceNeededMax = 120;
+
+export const listRepairLeadsResponseOneTwoWatchBrandMax = 120;
+
+export const listRepairLeadsResponseOneTwoWatchModelMax = 120;
+
+export const listRepairLeadsResponseOneTwoDescriptionMax = 5000;
+
+export const listRepairLeadsResponseOneTwoIntakeModeDefault = `unsure`;
+
+export const ListRepairLeadsResponseItem = zod.object({
+  "utmSource": zod.string().max(listRepairLeadsResponseOneOneUtmSourceMax).optional(),
+  "utmMedium": zod.string().max(listRepairLeadsResponseOneOneUtmMediumMax).optional(),
+  "utmCampaign": zod.string().max(listRepairLeadsResponseOneOneUtmCampaignMax).optional(),
+  "utmTerm": zod.string().max(listRepairLeadsResponseOneOneUtmTermMax).optional(),
+  "utmContent": zod.string().max(listRepairLeadsResponseOneOneUtmContentMax).optional(),
+  "referrer": zod.string().max(listRepairLeadsResponseOneOneReferrerMax).optional(),
+  "source": zod.string().max(listRepairLeadsResponseOneOneSourceMax).optional(),
+  "variant": zod.string().max(listRepairLeadsResponseOneOneVariantMax).optional(),
+  "device": zod.string().max(listRepairLeadsResponseOneOneDeviceMax).optional(),
+  "selectedCta": zod.string().max(listRepairLeadsResponseOneOneSelectedCtaMax).optional()
+}).and(zod.object({
+  "name": zod.string().min(1).max(listRepairLeadsResponseOneTwoNameMax),
+  "email": zod.email().max(listRepairLeadsResponseOneTwoEmailMax).optional(),
+  "phone": zod.string().min(listRepairLeadsResponseOneTwoPhoneMin).max(listRepairLeadsResponseOneTwoPhoneMax).optional(),
+  "preferredChannel": zod.enum(['email', 'phone', 'sms', 'none']).default(listRepairLeadsResponseOneTwoPreferredChannelDefault),
+  "emailConsent": zod.boolean().default(listRepairLeadsResponseOneTwoEmailConsentDefault),
+  "phoneConsent": zod.boolean().default(listRepairLeadsResponseOneTwoPhoneConsentDefault),
+  "smsConsent": zod.boolean().default(listRepairLeadsResponseOneTwoSmsConsentDefault),
+  "serviceNeeded": zod.string().max(listRepairLeadsResponseOneTwoServiceNeededMax).optional(),
+  "watchBrand": zod.string().max(listRepairLeadsResponseOneTwoWatchBrandMax).optional(),
+  "watchModel": zod.string().max(listRepairLeadsResponseOneTwoWatchModelMax).optional(),
+  "description": zod.string().min(1).max(listRepairLeadsResponseOneTwoDescriptionMax),
+  "intakeMode": zod.enum(['mail_in', 'in_store', 'unsure']).default(listRepairLeadsResponseOneTwoIntakeModeDefault)
+})).and(zod.object({
+  "id": zod.int(),
+  "status": zod.enum(['new', 'contacted', 'visit_planned', 'watch_received', 'estimate_pending', 'won', 'lost']),
+  "adminOwner": zod.string().nullish(),
+  "adminSummary": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}))
+export const ListRepairLeadsResponse = zod.array(ListRepairLeadsResponseItem)
+
+
+export const GetRepairLeadReportResponse = zod.object({
+  "total": zod.int(),
+  "byStatus": zod.record(zod.string(), zod.int()),
+  "bySource": zod.record(zod.string(), zod.int()),
+  "byCampaign": zod.record(zod.string(), zod.int()),
+  "byVariant": zod.record(zod.string(), zod.int()),
+  "byServiceNeeded": zod.record(zod.string(), zod.int()),
+  "metrics": zod.object({
+  "callClicks": zod.int(),
+  "directionsClicks": zod.int(),
+  "intakeSubmissions": zod.int(),
+  "watchesReceived": zod.int(),
+  "wonRepairs": zod.int()
+}),
+  "stageConversionPercentages": zod.object({
+  "intakeToWatchReceived": zod.number(),
+  "watchReceivedToWon": zod.number(),
+  "intakeToWon": zod.number()
+}),
+  "conversionRate": zod.number()
+})
+
+
+export const GetRepairLeadParams = zod.object({
+  "id": zod.coerce.number().int()
+})
+
+export const getRepairLeadResponseLeadOneOneUtmSourceMax = 255;
+
+export const getRepairLeadResponseLeadOneOneUtmMediumMax = 255;
+
+export const getRepairLeadResponseLeadOneOneUtmCampaignMax = 255;
+
+export const getRepairLeadResponseLeadOneOneUtmTermMax = 255;
+
+export const getRepairLeadResponseLeadOneOneUtmContentMax = 255;
+
+export const getRepairLeadResponseLeadOneOneReferrerMax = 2000;
+
+export const getRepairLeadResponseLeadOneOneSourceMax = 255;
+
+export const getRepairLeadResponseLeadOneOneVariantMax = 120;
+
+export const getRepairLeadResponseLeadOneOneDeviceMax = 80;
+
+export const getRepairLeadResponseLeadOneOneSelectedCtaMax = 160;
+
+export const getRepairLeadResponseLeadOneTwoNameMax = 160;
+
+export const getRepairLeadResponseLeadOneTwoEmailMax = 320;
+
+export const getRepairLeadResponseLeadOneTwoPhoneMin = 5;
+export const getRepairLeadResponseLeadOneTwoPhoneMax = 40;
+
+export const getRepairLeadResponseLeadOneTwoPreferredChannelDefault = `none`;
+export const getRepairLeadResponseLeadOneTwoEmailConsentDefault = false;
+export const getRepairLeadResponseLeadOneTwoPhoneConsentDefault = false;
+export const getRepairLeadResponseLeadOneTwoSmsConsentDefault = false;
+export const getRepairLeadResponseLeadOneTwoServiceNeededMax = 120;
+
+export const getRepairLeadResponseLeadOneTwoWatchBrandMax = 120;
+
+export const getRepairLeadResponseLeadOneTwoWatchModelMax = 120;
+
+export const getRepairLeadResponseLeadOneTwoDescriptionMax = 5000;
+
+export const getRepairLeadResponseLeadOneTwoIntakeModeDefault = `unsure`;
+
+export const GetRepairLeadResponse = zod.object({
+  "lead": zod.object({
+  "utmSource": zod.string().max(getRepairLeadResponseLeadOneOneUtmSourceMax).optional(),
+  "utmMedium": zod.string().max(getRepairLeadResponseLeadOneOneUtmMediumMax).optional(),
+  "utmCampaign": zod.string().max(getRepairLeadResponseLeadOneOneUtmCampaignMax).optional(),
+  "utmTerm": zod.string().max(getRepairLeadResponseLeadOneOneUtmTermMax).optional(),
+  "utmContent": zod.string().max(getRepairLeadResponseLeadOneOneUtmContentMax).optional(),
+  "referrer": zod.string().max(getRepairLeadResponseLeadOneOneReferrerMax).optional(),
+  "source": zod.string().max(getRepairLeadResponseLeadOneOneSourceMax).optional(),
+  "variant": zod.string().max(getRepairLeadResponseLeadOneOneVariantMax).optional(),
+  "device": zod.string().max(getRepairLeadResponseLeadOneOneDeviceMax).optional(),
+  "selectedCta": zod.string().max(getRepairLeadResponseLeadOneOneSelectedCtaMax).optional()
+}).and(zod.object({
+  "name": zod.string().min(1).max(getRepairLeadResponseLeadOneTwoNameMax),
+  "email": zod.email().max(getRepairLeadResponseLeadOneTwoEmailMax).optional(),
+  "phone": zod.string().min(getRepairLeadResponseLeadOneTwoPhoneMin).max(getRepairLeadResponseLeadOneTwoPhoneMax).optional(),
+  "preferredChannel": zod.enum(['email', 'phone', 'sms', 'none']).default(getRepairLeadResponseLeadOneTwoPreferredChannelDefault),
+  "emailConsent": zod.boolean().default(getRepairLeadResponseLeadOneTwoEmailConsentDefault),
+  "phoneConsent": zod.boolean().default(getRepairLeadResponseLeadOneTwoPhoneConsentDefault),
+  "smsConsent": zod.boolean().default(getRepairLeadResponseLeadOneTwoSmsConsentDefault),
+  "serviceNeeded": zod.string().max(getRepairLeadResponseLeadOneTwoServiceNeededMax).optional(),
+  "watchBrand": zod.string().max(getRepairLeadResponseLeadOneTwoWatchBrandMax).optional(),
+  "watchModel": zod.string().max(getRepairLeadResponseLeadOneTwoWatchModelMax).optional(),
+  "description": zod.string().min(1).max(getRepairLeadResponseLeadOneTwoDescriptionMax),
+  "intakeMode": zod.enum(['mail_in', 'in_store', 'unsure']).default(getRepairLeadResponseLeadOneTwoIntakeModeDefault)
+})).and(zod.object({
+  "id": zod.int(),
+  "status": zod.enum(['new', 'contacted', 'visit_planned', 'watch_received', 'estimate_pending', 'won', 'lost']),
+  "adminOwner": zod.string().nullish(),
+  "adminSummary": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})),
+  "attachments": zod.array(zod.object({
+  "id": zod.int(),
+  "leadId": zod.int(),
+  "objectPath": zod.string(),
+  "originalName": zod.string(),
+  "contentType": zod.string(),
+  "size": zod.int(),
+  "createdAt": zod.coerce.date()
+})),
+  "events": zod.array(zod.object({
+  "id": zod.int(),
+  "leadId": zod.int(),
+  "type": zod.string(),
+  "note": zod.string().nullish(),
+  "fromStatus": zod.string().nullish(),
+  "toStatus": zod.string().nullish(),
+  "actorUserId": zod.string().nullish(),
+  "metadata": zod.record(zod.string(), zod.unknown()).nullish(),
+  "createdAt": zod.coerce.date()
+})),
+  "followUps": zod.array(zod.object({
+  "id": zod.int(),
+  "leadId": zod.int(),
+  "channel": zod.enum(['email', 'phone', 'sms']),
+  "status": zod.enum(['pending', 'completed', 'cancelled']),
+  "dueAt": zod.coerce.date(),
+  "completedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}))
+})
+
+
+export const UpdateRepairLeadParams = zod.object({
+  "id": zod.coerce.number().int()
+})
+
+export const updateRepairLeadBodyAdminOwnerMax = 160;
+
+export const updateRepairLeadBodyAdminSummaryMax = 5000;
+
+
+
+export const UpdateRepairLeadBody = zod.object({
+  "status": zod.enum(['new', 'contacted', 'visit_planned', 'watch_received', 'estimate_pending', 'won', 'lost']).optional(),
+  "adminOwner": zod.string().max(updateRepairLeadBodyAdminOwnerMax).nullish(),
+  "adminSummary": zod.string().max(updateRepairLeadBodyAdminSummaryMax).nullish()
+})
+
+export const updateRepairLeadResponseOneOneUtmSourceMax = 255;
+
+export const updateRepairLeadResponseOneOneUtmMediumMax = 255;
+
+export const updateRepairLeadResponseOneOneUtmCampaignMax = 255;
+
+export const updateRepairLeadResponseOneOneUtmTermMax = 255;
+
+export const updateRepairLeadResponseOneOneUtmContentMax = 255;
+
+export const updateRepairLeadResponseOneOneReferrerMax = 2000;
+
+export const updateRepairLeadResponseOneOneSourceMax = 255;
+
+export const updateRepairLeadResponseOneOneVariantMax = 120;
+
+export const updateRepairLeadResponseOneOneDeviceMax = 80;
+
+export const updateRepairLeadResponseOneOneSelectedCtaMax = 160;
+
+export const updateRepairLeadResponseOneTwoNameMax = 160;
+
+export const updateRepairLeadResponseOneTwoEmailMax = 320;
+
+export const updateRepairLeadResponseOneTwoPhoneMin = 5;
+export const updateRepairLeadResponseOneTwoPhoneMax = 40;
+
+export const updateRepairLeadResponseOneTwoPreferredChannelDefault = `none`;
+export const updateRepairLeadResponseOneTwoEmailConsentDefault = false;
+export const updateRepairLeadResponseOneTwoPhoneConsentDefault = false;
+export const updateRepairLeadResponseOneTwoSmsConsentDefault = false;
+export const updateRepairLeadResponseOneTwoServiceNeededMax = 120;
+
+export const updateRepairLeadResponseOneTwoWatchBrandMax = 120;
+
+export const updateRepairLeadResponseOneTwoWatchModelMax = 120;
+
+export const updateRepairLeadResponseOneTwoDescriptionMax = 5000;
+
+export const updateRepairLeadResponseOneTwoIntakeModeDefault = `unsure`;
+
+export const UpdateRepairLeadResponse = zod.object({
+  "utmSource": zod.string().max(updateRepairLeadResponseOneOneUtmSourceMax).optional(),
+  "utmMedium": zod.string().max(updateRepairLeadResponseOneOneUtmMediumMax).optional(),
+  "utmCampaign": zod.string().max(updateRepairLeadResponseOneOneUtmCampaignMax).optional(),
+  "utmTerm": zod.string().max(updateRepairLeadResponseOneOneUtmTermMax).optional(),
+  "utmContent": zod.string().max(updateRepairLeadResponseOneOneUtmContentMax).optional(),
+  "referrer": zod.string().max(updateRepairLeadResponseOneOneReferrerMax).optional(),
+  "source": zod.string().max(updateRepairLeadResponseOneOneSourceMax).optional(),
+  "variant": zod.string().max(updateRepairLeadResponseOneOneVariantMax).optional(),
+  "device": zod.string().max(updateRepairLeadResponseOneOneDeviceMax).optional(),
+  "selectedCta": zod.string().max(updateRepairLeadResponseOneOneSelectedCtaMax).optional()
+}).and(zod.object({
+  "name": zod.string().min(1).max(updateRepairLeadResponseOneTwoNameMax),
+  "email": zod.email().max(updateRepairLeadResponseOneTwoEmailMax).optional(),
+  "phone": zod.string().min(updateRepairLeadResponseOneTwoPhoneMin).max(updateRepairLeadResponseOneTwoPhoneMax).optional(),
+  "preferredChannel": zod.enum(['email', 'phone', 'sms', 'none']).default(updateRepairLeadResponseOneTwoPreferredChannelDefault),
+  "emailConsent": zod.boolean().default(updateRepairLeadResponseOneTwoEmailConsentDefault),
+  "phoneConsent": zod.boolean().default(updateRepairLeadResponseOneTwoPhoneConsentDefault),
+  "smsConsent": zod.boolean().default(updateRepairLeadResponseOneTwoSmsConsentDefault),
+  "serviceNeeded": zod.string().max(updateRepairLeadResponseOneTwoServiceNeededMax).optional(),
+  "watchBrand": zod.string().max(updateRepairLeadResponseOneTwoWatchBrandMax).optional(),
+  "watchModel": zod.string().max(updateRepairLeadResponseOneTwoWatchModelMax).optional(),
+  "description": zod.string().min(1).max(updateRepairLeadResponseOneTwoDescriptionMax),
+  "intakeMode": zod.enum(['mail_in', 'in_store', 'unsure']).default(updateRepairLeadResponseOneTwoIntakeModeDefault)
+})).and(zod.object({
+  "id": zod.int(),
+  "status": zod.enum(['new', 'contacted', 'visit_planned', 'watch_received', 'estimate_pending', 'won', 'lost']),
+  "adminOwner": zod.string().nullish(),
+  "adminSummary": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}))
+
+
+export const AddRepairLeadNoteParams = zod.object({
+  "id": zod.coerce.number().int()
+})
+
+export const addRepairLeadNoteBodyNoteMax = 5000;
+
+
+
+export const AddRepairLeadNoteBody = zod.object({
+  "note": zod.string().min(1).max(addRepairLeadNoteBodyNoteMax)
+})
+
+export const AddRepairLeadNoteResponse = zod.object({
+  "id": zod.int(),
+  "leadId": zod.int(),
+  "type": zod.string(),
+  "note": zod.string().nullish(),
+  "fromStatus": zod.string().nullish(),
+  "toStatus": zod.string().nullish(),
+  "actorUserId": zod.string().nullish(),
+  "metadata": zod.record(zod.string(), zod.unknown()).nullish(),
+  "createdAt": zod.coerce.date()
+})
+
+
+export const DownloadRepairLeadAttachmentParams = zod.object({
+  "id": zod.coerce.number().int(),
+  "attachmentId": zod.coerce.number().int()
+})
+
+export const DownloadRepairLeadAttachmentResponse = zod.unknown()
+
+
+export const ListFollowUpsQueryParams = zod.object({
+  "status": zod.enum(['pending', 'completed', 'cancelled']).optional(),
+  "dueBefore": zod.date().optional()
+})
+
+export const ListFollowUpsResponseItem = zod.object({
+  "id": zod.int(),
+  "leadId": zod.int(),
+  "channel": zod.enum(['email', 'phone', 'sms']),
+  "status": zod.enum(['pending', 'completed', 'cancelled']),
+  "dueAt": zod.coerce.date(),
+  "completedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+export const ListFollowUpsResponse = zod.array(ListFollowUpsResponseItem)
+
+
+export const UpdateFollowUpParams = zod.object({
+  "id": zod.coerce.number().int()
+})
+
+export const UpdateFollowUpBody = zod.object({
+  "status": zod.enum(['pending', 'completed', 'cancelled']).optional(),
+  "dueAt": zod.coerce.date().optional()
+})
+
+export const UpdateFollowUpResponse = zod.object({
+  "id": zod.int(),
+  "leadId": zod.int(),
+  "channel": zod.enum(['email', 'phone', 'sms']),
+  "status": zod.enum(['pending', 'completed', 'cancelled']),
+  "dueAt": zod.coerce.date(),
+  "completedAt": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
