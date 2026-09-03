@@ -7,6 +7,8 @@
  */
 
 export interface UploadTarget {
+  /** Same-origin API path for the reserved upload. */
   uploadURL: string;
   objectPath: string;
+  attachmentId: number;
 }

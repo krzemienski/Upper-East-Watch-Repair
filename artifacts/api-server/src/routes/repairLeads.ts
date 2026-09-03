@@ -43,25 +43,65 @@ import {
   eq,
   gte,
   ilike,
+  isNotNull,
+  isNull,
   lte,
   or,
   sql,
   type SQL,
 } from "drizzle-orm";
-import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
-import { Router, type IRouter, type Request, type Response } from "express";
+import { createHash, randomBytes, randomUUID, timingSafeEqual } from "node:crypto";
+import express, { Router, type IRouter, type Request, type Response } from "express";
 import { isAdminUser } from "../lib/admin";
 import {
-  createLeadUploadUrl,
+  createLeadObjectPath,
+  deletePrivateObject,
   getPrivateObject,
   inspectPrivateObject,
   pipePrivateObject,
+  writePrivateObject,
 } from "../lib/objectStorage";
+import { logger } from "../lib/logger";
 
 const router: IRouter = Router();
 const imageTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
 const MAX_IMAGES = 5;
 const MAX_SIZE = 8 * 1024 * 1024;
+const RESERVATION_TTL_MS = 15 * 60_000;
+
+async function cleanupExpiredReservations(leadId?: number): Promise<void> {
+  const conditions = [
+    isNull(leadAttachmentsTable.finalizedAt),
+    lte(leadAttachmentsTable.expiresAt, new Date()),
+  ];
+  if (leadId) conditions.push(eq(leadAttachmentsTable.leadId, leadId));
+  const expired = await db
+    .select({
+      id: leadAttachmentsTable.id,
+      leadId: leadAttachmentsTable.leadId,
+      objectPath: leadAttachmentsTable.objectPath,
+    })
+    .from(leadAttachmentsTable)
+    .where(and(...conditions));
+  for (const item of expired) {
+    await deletePrivateObject(item.objectPath, item.leadId);
+    await db
+      .delete(leadAttachmentsTable)
+      .where(
+        and(
+          eq(leadAttachmentsTable.id, item.id),
+          isNull(leadAttachmentsTable.finalizedAt),
+          lte(leadAttachmentsTable.expiresAt, new Date()),
+        ),
+      );
+  }
+}
+const cleanupTimer = setInterval(() => {
+  void cleanupExpiredReservations().catch((error: unknown) =>
+    logger.warn({ err: error }, "Unable to clean expired lead upload reservations"),
+  );
+}, RESERVATION_TTL_MS);
+cleanupTimer.unref();
 
 function requireAdmin(req: Request, res: Response): boolean {
   if (!req.isAuthenticated()) {
@@ -196,17 +236,100 @@ router.post("/leads/:id/uploads/request-url", async (req, res): Promise<void> =>
     res.status(401).json({ error: "Invalid or expired upload token" });
     return;
   }
-  const [{ value: attachmentCount }] = await db
-    .select({ value: count() })
-    .from(leadAttachmentsTable)
-    .where(eq(leadAttachmentsTable.leadId, params.data.id));
-  if (attachmentCount >= MAX_IMAGES) {
-    res.status(400).json({ error: "A lead may have at most 5 images" });
-    return;
+  const now = new Date();
+  try {
+    await cleanupExpiredReservations(params.data.id);
+    const result = await db.transaction(async (tx) => {
+      await tx.select({ id: repairLeadsTable.id }).from(repairLeadsTable).where(eq(repairLeadsTable.id, params.data.id)).for("update");
+      const [existing] = await tx.select().from(leadAttachmentsTable).where(and(eq(leadAttachmentsTable.leadId, params.data.id), eq(leadAttachmentsTable.clientUploadId, body.data.clientUploadId))).limit(1);
+      if (existing) {
+        if (existing.originalName !== body.data.name || existing.contentType !== body.data.contentType || existing.size !== body.data.size) throw new Error("RESERVATION_METADATA_MISMATCH");
+        return existing;
+      }
+      const [{ value }] = await tx.select({ value: count() }).from(leadAttachmentsTable).where(and(eq(leadAttachmentsTable.leadId, params.data.id), or(gte(leadAttachmentsTable.expiresAt, now), isNotNull(leadAttachmentsTable.finalizedAt))));
+      if (value >= MAX_IMAGES) throw new Error("IMAGE_LIMIT");
+      const [attachment] = await tx.insert(leadAttachmentsTable).values({
+        leadId: params.data.id, clientUploadId: body.data.clientUploadId,
+        objectPath: createLeadObjectPath(params.data.id, randomUUID()),
+        originalName: body.data.name, contentType: body.data.contentType, size: body.data.size,
+        expiresAt: new Date(now.getTime() + RESERVATION_TTL_MS),
+      }).returning();
+      return attachment;
+    });
+    res.json(RequestLeadUploadUrlResponse.parse({
+      uploadURL: `/api/leads/${params.data.id}/uploads/${result.id}`,
+      objectPath: result.objectPath,
+      attachmentId: result.id,
+    }));
+  } catch (error) {
+    if (error instanceof Error && error.message === "IMAGE_LIMIT") {
+      res.status(400).json({ error: "A lead may have at most 5 images" });
+      return;
+    }
+    if (error instanceof Error && error.message === "RESERVATION_METADATA_MISMATCH") {
+      res.status(400).json({ error: "clientUploadId metadata does not match its reservation" });
+      return;
+    }
+    throw error;
   }
-  const target = await createLeadUploadUrl(params.data.id);
-  res.json(RequestLeadUploadUrlResponse.parse(target));
 });
+
+router.put("/leads/:id/uploads/:attachmentId",
+  express.raw({ limit: MAX_SIZE, type: (req) => imageTypes.has(String(req.headers["content-type"] ?? "").split(";")[0].trim().toLowerCase()) }),
+  async (req, res): Promise<void> => {
+    const leadId = Number(req.params.id);
+    const attachmentId = Number(req.params.attachmentId);
+    if (!Number.isSafeInteger(leadId) || leadId <= 0 || !Number.isSafeInteger(attachmentId) || attachmentId <= 0) {
+      res.status(400).json({ error: "Invalid upload target" }); return;
+    }
+    if (!(await validUploadToken(leadId, headerToken(req)))) {
+      res.status(401).json({ error: "Invalid or expired upload token" }); return;
+    }
+    const contentType = req.header("Content-Type");
+    const contentLength = req.header("Content-Length");
+    const bytes = req.body;
+    if (!contentType || !imageTypes.has(contentType) || !contentLength || !/^[1-9][0-9]*$/.test(contentLength) || !Buffer.isBuffer(bytes) || bytes.length !== Number(contentLength)) {
+      res.status(400).json({ error: "Content-Type and Content-Length must exactly match image bytes" }); return;
+    }
+    const reservation = await db.transaction(async (tx) => {
+      const [row] = await tx.select().from(leadAttachmentsTable).where(and(eq(leadAttachmentsTable.id, attachmentId), eq(leadAttachmentsTable.leadId, leadId))).for("update").limit(1);
+      if (!row || (!row.uploadedAt && row.expiresAt <= new Date()) || row.contentType !== contentType || row.size !== bytes.length) return null;
+      return row;
+    });
+    if (!reservation) { res.status(400).json({ error: "Upload reservation is invalid, expired, or does not match" }); return; }
+    try {
+      const object = await inspectPrivateObject(reservation.objectPath, leadId).catch(() => null);
+      if (object && (object.contentType !== contentType || object.size !== bytes.length)) throw new Error("metadata");
+      if (object) {
+        await db.update(leadAttachmentsTable).set({ uploadedAt: new Date() }).where(eq(leadAttachmentsTable.id, attachmentId));
+        res.status(204).end();
+        return;
+      }
+      const [claimed] = await db.update(leadAttachmentsTable)
+        .set({ uploadedAt: new Date() })
+        .where(and(eq(leadAttachmentsTable.id, attachmentId), isNull(leadAttachmentsTable.uploadedAt)))
+        .returning({ id: leadAttachmentsTable.id });
+      if (!claimed) {
+        const stored = await inspectPrivateObject(reservation.objectPath, leadId).catch(() => null);
+        if (!stored || stored.contentType !== contentType || stored.size !== bytes.length) throw new Error("already claimed");
+        res.status(204).end();
+        return;
+      }
+      await writePrivateObject(reservation.objectPath, leadId, bytes, contentType);
+      res.status(204).end();
+    } catch {
+      const stored = await inspectPrivateObject(reservation.objectPath, leadId).catch(() => null);
+      if (stored?.contentType === contentType && stored.size === bytes.length) {
+        await db.update(leadAttachmentsTable).set({ uploadedAt: new Date() }).where(eq(leadAttachmentsTable.id, attachmentId));
+        res.status(204).end();
+        return;
+      }
+      await deletePrivateObject(reservation.objectPath, leadId);
+      await db.delete(leadAttachmentsTable).where(and(eq(leadAttachmentsTable.id, attachmentId), isNull(leadAttachmentsTable.finalizedAt)));
+      res.status(400).json({ error: "Upload could not be stored with the reserved metadata" });
+    }
+  },
+);
 
 router.post("/leads/:id/attachments", async (req, res): Promise<void> => {
   const params = FinalizeLeadAttachmentParams.safeParse(req.params);
@@ -219,20 +342,61 @@ router.post("/leads/:id/attachments", async (req, res): Promise<void> => {
     res.status(401).json({ error: "Invalid or expired upload token" });
     return;
   }
+  const [reservation] = await db
+    .select()
+    .from(leadAttachmentsTable)
+    .where(
+      and(
+        eq(leadAttachmentsTable.leadId, params.data.id),
+        eq(leadAttachmentsTable.objectPath, body.data.objectPath),
+      ),
+    )
+    .limit(1);
+  if (
+    !reservation ||
+    reservation.clientUploadId !== body.data.clientUploadId ||
+    reservation.originalName !== body.data.name ||
+    reservation.contentType !== body.data.contentType ||
+    reservation.size !== body.data.size
+  ) {
+    if (!reservation || !reservation.finalizedAt) {
+      await deletePrivateObject(body.data.objectPath, params.data.id);
+      if (reservation) {
+        await db.delete(leadAttachmentsTable).where(
+          and(eq(leadAttachmentsTable.id, reservation.id), isNull(leadAttachmentsTable.finalizedAt)),
+        );
+      }
+    }
+    res.status(400).json({ error: "Attachment does not match an upload reservation" });
+    return;
+  }
+  if (reservation.finalizedAt) {
+    res.json(FinalizeLeadAttachmentResponse.parse(reservation));
+    return;
+  }
   let actual: { contentType: string; size: number };
   try {
     actual = await inspectPrivateObject(body.data.objectPath, params.data.id);
   } catch {
+    await db.delete(leadAttachmentsTable).where(
+      and(eq(leadAttachmentsTable.id, reservation.id), isNull(leadAttachmentsTable.finalizedAt)),
+    );
     res.status(400).json({ error: "Uploaded object was not found" });
     return;
   }
   if (
+    !reservation.uploadedAt ||
+    reservation.expiresAt <= new Date() ||
     !imageTypes.has(actual.contentType) ||
     actual.size <= 0 ||
     actual.size > MAX_SIZE ||
     actual.contentType !== body.data.contentType ||
     actual.size !== body.data.size
   ) {
+    await deletePrivateObject(reservation.objectPath, params.data.id);
+    await db.delete(leadAttachmentsTable).where(
+      and(eq(leadAttachmentsTable.id, reservation.id), isNull(leadAttachmentsTable.finalizedAt)),
+    );
     res.status(400).json({ error: "Uploaded image metadata does not match" });
     return;
   }
@@ -243,29 +407,27 @@ router.post("/leads/:id/attachments", async (req, res): Promise<void> => {
         .from(repairLeadsTable)
         .where(eq(repairLeadsTable.id, params.data.id))
         .for("update");
-      const [{ value }] = await tx
-        .select({ value: count() })
-        .from(leadAttachmentsTable)
-        .where(eq(leadAttachmentsTable.leadId, params.data.id));
-      if (value >= MAX_IMAGES) throw new Error("IMAGE_LIMIT");
       const [created] = await tx
-        .insert(leadAttachmentsTable)
-        .values({
-          leadId: params.data.id,
-          objectPath: body.data.objectPath,
-          originalName: body.data.name,
-          contentType: actual.contentType,
-          size: actual.size,
-        })
+        .update(leadAttachmentsTable)
+        .set({ finalizedAt: new Date() })
+        .where(
+          and(
+            eq(leadAttachmentsTable.id, reservation.id),
+            eq(leadAttachmentsTable.leadId, params.data.id),
+            isNull(leadAttachmentsTable.finalizedAt),
+          ),
+        )
         .returning();
-      return created;
+      if (created) return created;
+      const [finalized] = await tx
+        .select()
+        .from(leadAttachmentsTable)
+        .where(eq(leadAttachmentsTable.id, reservation.id))
+        .limit(1);
+      return finalized;
     });
     res.status(201).json(FinalizeLeadAttachmentResponse.parse(attachment));
   } catch (error) {
-    if (error instanceof Error && error.message === "IMAGE_LIMIT") {
-      res.status(400).json({ error: "A lead may have at most 5 images" });
-      return;
-    }
     if (
       typeof error === "object" &&
       error !== null &&
@@ -379,6 +541,8 @@ router.get("/admin/leads/report", async (req, res): Promise<void> => {
   const metrics = {
     callClicks: funnelMetrics?.callClicks ?? 0,
     directionsClicks: funnelMetrics?.directionsClicks ?? 0,
+    ctaClicks:
+      (funnelMetrics?.callClicks ?? 0) + (funnelMetrics?.directionsClicks ?? 0),
     intakeSubmissions: leadMetrics?.intakeSubmissions ?? 0,
     watchesReceived: leadMetrics?.watchesReceived ?? 0,
     wonRepairs: leadMetrics?.wonRepairs ?? 0,

@@ -489,13 +489,37 @@ export const requestLeadUploadUrlBodySizeMax = 8388608;
 export const RequestLeadUploadUrlBody = zod.object({
   "name": zod.string().min(1).max(requestLeadUploadUrlBodyNameMax),
   "size": zod.int().min(1).max(requestLeadUploadUrlBodySizeMax),
-  "contentType": zod.enum(['image/jpeg', 'image/png', 'image/webp'])
+  "contentType": zod.enum(['image/jpeg', 'image/png', 'image/webp']),
+  "clientUploadId": zod.uuid()
 })
 
 export const RequestLeadUploadUrlResponse = zod.object({
-  "uploadURL": zod.url(),
-  "objectPath": zod.string()
+  "uploadURL": zod.string().describe('Same-origin API path for the reserved upload.'),
+  "objectPath": zod.string(),
+  "attachmentId": zod.int()
 })
+
+
+/**
+ * @summary Upload bytes to a reserved private attachment target
+ */
+export const UploadLeadAttachmentParams = zod.object({
+  "id": zod.coerce.number().int(),
+  "attachmentId": zod.coerce.number().int()
+})
+
+export const uploadLeadAttachmentHeaderXLeadUploadTokenMin = 32;
+
+export const uploadLeadAttachmentHeaderContentLengthMax = 8388608;
+
+
+
+export const UploadLeadAttachmentHeader = zod.object({
+  "X-Lead-Upload-Token": zod.string().min(uploadLeadAttachmentHeaderXLeadUploadTokenMin),
+  "Content-Length": zod.int().min(1).max(uploadLeadAttachmentHeaderContentLengthMax)
+})
+
+export const UploadLeadAttachmentResponse = zod.void()
 
 
 export const FinalizeLeadAttachmentParams = zod.object({
@@ -520,7 +544,8 @@ export const finalizeLeadAttachmentBodyTwoObjectPathRegExp = new RegExp('^/objec
 export const FinalizeLeadAttachmentBody = zod.object({
   "name": zod.string().min(1).max(finalizeLeadAttachmentBodyOneNameMax),
   "size": zod.int().min(1).max(finalizeLeadAttachmentBodyOneSizeMax),
-  "contentType": zod.enum(['image/jpeg', 'image/png', 'image/webp'])
+  "contentType": zod.enum(['image/jpeg', 'image/png', 'image/webp']),
+  "clientUploadId": zod.uuid()
 }).and(zod.object({
   "objectPath": zod.string().regex(finalizeLeadAttachmentBodyTwoObjectPathRegExp)
 }))
@@ -529,9 +554,13 @@ export const FinalizeLeadAttachmentResponse = zod.object({
   "id": zod.int(),
   "leadId": zod.int(),
   "objectPath": zod.string(),
+  "clientUploadId": zod.uuid(),
   "originalName": zod.string(),
   "contentType": zod.string(),
   "size": zod.int(),
+  "expiresAt": zod.coerce.date(),
+  "uploadedAt": zod.coerce.date().nullish(),
+  "finalizedAt": zod.coerce.date().nullish(),
   "createdAt": zod.coerce.date()
 })
 
@@ -638,6 +667,7 @@ export const GetRepairLeadReportResponse = zod.object({
   "byVariant": zod.record(zod.string(), zod.int()),
   "byServiceNeeded": zod.record(zod.string(), zod.int()),
   "metrics": zod.object({
+  "ctaClicks": zod.int().describe('Total CTA clicks; equal to callClicks plus directionsClicks.'),
   "callClicks": zod.int(),
   "directionsClicks": zod.int(),
   "intakeSubmissions": zod.int(),
@@ -735,9 +765,13 @@ export const GetRepairLeadResponse = zod.object({
   "id": zod.int(),
   "leadId": zod.int(),
   "objectPath": zod.string(),
+  "clientUploadId": zod.uuid(),
   "originalName": zod.string(),
   "contentType": zod.string(),
   "size": zod.int(),
+  "expiresAt": zod.coerce.date(),
+  "uploadedAt": zod.coerce.date().nullish(),
+  "finalizedAt": zod.coerce.date().nullish(),
   "createdAt": zod.coerce.date()
 })),
   "events": zod.array(zod.object({

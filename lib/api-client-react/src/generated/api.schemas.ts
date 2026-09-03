@@ -157,11 +157,14 @@ export interface UploadRequest {
      */
   size: number;
   contentType: UploadRequestContentType;
+  clientUploadId: string;
 }
 
 export interface UploadTarget {
+  /** Same-origin API path for the reserved upload. */
   uploadURL: string;
   objectPath: string;
+  attachmentId: number;
 }
 
 export type AttachmentInput = UploadRequest & {
@@ -173,9 +176,15 @@ export interface LeadAttachment {
   id: number;
   leadId: number;
   objectPath: string;
+  clientUploadId: string;
   originalName: string;
   contentType: string;
   size: number;
+  expiresAt: string;
+  /** @nullable */
+  uploadedAt?: string | null;
+  /** @nullable */
+  finalizedAt?: string | null;
   createdAt: string;
 }
 
@@ -285,6 +294,8 @@ export type LeadReportByVariant = {[key: string]: number};
 export type LeadReportByServiceNeeded = {[key: string]: number};
 
 export type LeadReportMetrics = {
+  /** Total CTA clicks; equal to callClicks plus directionsClicks. */
+  ctaClicks: number;
   callClicks: number;
   directionsClicks: number;
   intakeSubmissions: number;

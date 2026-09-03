@@ -133,12 +133,20 @@ function LeadWorkspace({ userName, onLogout }: { userName: string; onLogout: () 
       .catch(() => toast({ title: 'Could not load lead detail', variant: 'destructive' }));
   }, [selectedId, detailVersion]);
 
-  const stats = useMemo(() => [
-    ['CTA clicks', metric(report, ['ctaClicks', 'totalCtaClicks'], 0), MousePointerClick],
+  const stats = useMemo(() => {
+    const reportMetrics = report.metrics as AnyRecord | undefined;
+    const callClicks = metric(reportMetrics ?? {}, ['callClicks'], 0);
+    const directionsClicks = metric(reportMetrics ?? {}, ['directionsClicks'], 0);
+    const ctaClicks = metric(reportMetrics ?? {}, ['ctaClicks'], callClicks + directionsClicks);
+    return [
+    ['CTA clicks', ctaClicks, MousePointerClick],
+    ['Calls', callClicks, MousePointerClick],
+    ['Directions', directionsClicks, MousePointerClick],
     ['Submissions', metric(report, ['submissions', 'totalSubmissions', 'total'], leads.length), Send],
     ['Watches received', metric(report, ['watchesReceived', 'received'], report.byStatus?.watch_received ?? 0), Watch],
     ['Won', metric(report, ['won', 'wonLeads'], report.byStatus?.won ?? 0), ClipboardList],
-  ] as const, [report, leads, followUps]);
+    ] as const;
+  }, [report, leads]);
 
   const breakdowns = useMemo(() => [
     ['Source', firstBreakdown(report, ['bySource', 'sources'])],
@@ -188,7 +196,7 @@ function LeadWorkspace({ userName, onLogout }: { userName: string; onLogout: () 
             <p className="font-serif text-2xl font-semibold">{formatPercent(report.conversionRate)}</p>
           </div>
         </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 mb-4">
           {stats.map(([label, value, Icon]) => <Card key={label}><CardContent className="pt-5 flex items-start justify-between gap-3"><div><p className="text-xs text-muted-foreground uppercase tracking-wide">{label}</p><p className="font-serif text-3xl font-semibold mt-1">{String(value ?? '—')}</p></div><Icon className="h-5 w-5 text-primary" /></CardContent></Card>)}
         </div>
         <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-3 mb-7">

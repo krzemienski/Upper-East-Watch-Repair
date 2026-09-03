@@ -10,8 +10,14 @@ export interface LeadAttachment {
   id: number;
   leadId: number;
   objectPath: string;
+  clientUploadId: string;
   originalName: string;
   contentType: string;
   size: number;
+  expiresAt: Date;
+  /** @nullable */
+  uploadedAt?: Date | null;
+  /** @nullable */
+  finalizedAt?: Date | null;
   createdAt: Date;
 }

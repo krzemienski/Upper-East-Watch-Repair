@@ -17,6 +17,19 @@
 }
 
 @layer utilities {
+  /*
+   * Keep the fixed movement visible beneath the public site without allowing it
+   * to compete with content. Explicit page and card surfaces remain substantial,
+   * but are no longer fully opaque.
+   */
+  .site-cinematic-content .bg-background {
+    background-color: hsl(var(--background) / 0.88);
+  }
+
+  .site-cinematic-content .bg-card {
+    background-color: hsl(var(--card) / 0.9);
+  }
+
   .font-serif {
     font-family: var(--app-font-serif);
   }

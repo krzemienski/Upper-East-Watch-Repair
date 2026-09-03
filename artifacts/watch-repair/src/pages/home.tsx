@@ -19,7 +19,6 @@ import {
 } from '@workspace/upper-east-horology/components/ui/card';
 import { Badge } from '@workspace/upper-east-horology/components/ui/badge';
 import { PageMeta } from '@/components/PageMeta';
-import { HeroMedia } from '@/components/HeroMedia';
 import { WatchPoster } from '@/components/WatchPoster';
 import { Section, SectionHeading } from '@/components/Section';
 import { services } from '@/data/services';
@@ -61,7 +60,6 @@ export default function HomePage() {
 
       {/* HERO */}
       <section className="relative min-h-[88vh] flex items-center border-b border-border">
-        <HeroMedia />
         <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-24 w-full">
           <div className="max-w-2xl">
             <Badge variant="outline" className="mb-6 backdrop-blur-sm" data-testid="badge-location">

@@ -30,6 +30,20 @@ type IntakeState = {
   notes: string;
 };
 
+type SelectedImage = {
+  file: File;
+  clientUploadId: string;
+};
+
+type ConfirmationState = {
+  reference: string;
+  leadId: string | number;
+  uploadToken?: string;
+  files: SelectedImage[];
+  photoStatus: 'not_needed' | 'uploading' | 'warning' | 'complete';
+  photoError?: string;
+};
+
 const initial: IntakeState = {
   name: '', phone: '', email: '', preferredContact: '', serviceCategory: '',
   brand: '', model: '', reference: '', movement: '', symptoms: '', urgency: 'flexible',
@@ -44,11 +58,12 @@ export default function RepairIntakePage({ inStore = false }: { inStore?: boolea
   const [, navigate] = useLocation();
   const [values, setValues] = useState(initial);
   const [consent, setConsent] = useState(false);
-  const [files, setFiles] = useState<File[]>([]);
+  const [files, setFiles] = useState<SelectedImage[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [confirmation, setConfirmation] = useState('');
+  const [confirmation, setConfirmation] = useState<ConfirmationState | null>(null);
+  const [photosUploading, setPhotosUploading] = useState(false);
 
   useEffect(() => {
     trackFunnelEvent(inStore ? 'in_store_intake_started' : 'repair_intake_started');
@@ -81,10 +96,10 @@ export default function RepairIntakePage({ inStore = false }: { inStore?: boolea
       return;
     }
     setError('');
-    const next = [...files, ...incoming].slice(0, 5);
+    const next = [...files, ...incoming.map((file) => ({ file, clientUploadId: crypto.randomUUID() }))].slice(0, 5);
     previews.forEach(URL.revokeObjectURL);
     setFiles(next);
-    setPreviews(next.map((file) => URL.createObjectURL(file)));
+    setPreviews(next.map(({ file }) => URL.createObjectURL(file)));
     event.target.value = '';
   }
 
@@ -92,15 +107,27 @@ export default function RepairIntakePage({ inStore = false }: { inStore?: boolea
     URL.revokeObjectURL(previews[index]);
     const next = files.filter((_, i) => i !== index);
     setFiles(next);
-    setPreviews(next.map((file) => URL.createObjectURL(file)));
+    setPreviews(next.map(({ file }) => URL.createObjectURL(file)));
   }
 
-  async function uploadImages(leadId: string | number, uploadToken: string) {
-    for (const file of files) {
-      const request = await fetch(`/api/leads/${leadId}/uploads/request-url`, {
+  async function uploadImages(created: ConfirmationState) {
+    if (photosUploading) return;
+    if (!created.uploadToken) {
+      setConfirmation((current) => current ? {
+        ...current,
+        photoStatus: 'warning',
+        photoError: 'Your repair request was saved, but photos could not be uploaded. Please try again later.',
+      } : current);
+      return;
+    }
+    setPhotosUploading(true);
+    setConfirmation((current) => current ? { ...current, photoStatus: 'uploading', photoError: undefined } : current);
+    try {
+      for (const { file, clientUploadId } of created.files) {
+      const request = await fetch(`/api/leads/${created.leadId}/uploads/request-url`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Lead-Upload-Token': uploadToken },
-        body: JSON.stringify({ name: file.name, contentType: file.type, size: file.size }),
+        headers: { 'Content-Type': 'application/json', 'X-Lead-Upload-Token': created.uploadToken },
+        body: JSON.stringify({ name: file.name, contentType: file.type, size: file.size, clientUploadId }),
       });
       if (!request.ok) throw new Error('Your request was saved, but a photo could not be uploaded.');
       const upload = await request.json() as Record<string, unknown>;
@@ -109,17 +136,28 @@ export default function RepairIntakePage({ inStore = false }: { inStore?: boolea
       const url = String(rawUrl);
       const put = await fetch(url, { method: 'PUT', headers: { 'Content-Type': file.type }, body: file });
       if (!put.ok) throw new Error('Your request was saved, but a photo could not be uploaded.');
-      const attachment = await fetch(`/api/leads/${leadId}/attachments`, {
+      const attachment = await fetch(`/api/leads/${created.leadId}/attachments`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Lead-Upload-Token': uploadToken },
+        headers: { 'Content-Type': 'application/json', 'X-Lead-Upload-Token': created.uploadToken },
         body: JSON.stringify({
           name: file.name,
           contentType: file.type,
           size: file.size,
+           clientUploadId,
           objectPath: upload.objectPath ?? upload.key ?? upload.objectKey,
         }),
       });
       if (!attachment.ok) throw new Error('Your request was saved, but a photo could not be attached.');
+      }
+      setConfirmation((current) => current ? { ...current, photoStatus: 'complete', photoError: undefined } : current);
+    } catch {
+      setConfirmation((current) => current ? {
+        ...current,
+        photoStatus: 'warning',
+        photoError: 'Your repair request was saved, but one or more photos could not be attached. You can retry the photos without resubmitting your request.',
+      } : current);
+    } finally {
+      setPhotosUploading(false);
     }
   }
 
@@ -164,12 +202,18 @@ export default function RepairIntakePage({ inStore = false }: { inStore?: boolea
       });
       if (!response.ok) throw new Error('We could not submit your request. Please check the form and try again.');
       const result = await response.json() as { lead: Record<string, unknown>; uploadToken?: string };
-      const leadId = result.lead.id as string | number;
-      if (files.length && result.uploadToken) await uploadImages(leadId, result.uploadToken);
       const reference = parseReference(result.lead);
-      setConfirmation(reference);
-      trackFunnelEvent('repair_intake_submitted', { leadId, inStore, imageCount: files.length });
+       const created: ConfirmationState = {
+         reference,
+         leadId: result.lead.id as string | number,
+         uploadToken: result.uploadToken,
+         files,
+         photoStatus: files.length ? 'uploading' : 'not_needed',
+       };
+       setConfirmation(created);
+       trackFunnelEvent('repair_intake_submitted', { leadId: created.leadId, inStore, imageCount: files.length });
       window.scrollTo({ top: 0, behavior: 'smooth' });
+       if (files.length) void uploadImages(created);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Unable to submit your request.');
     } finally {
@@ -189,7 +233,32 @@ export default function RepairIntakePage({ inStore = false }: { inStore?: boolea
             <p className="text-xs uppercase tracking-[.2em] text-primary font-semibold mt-6">Request received</p>
             <h1 className="font-serif text-3xl font-semibold mt-2">We will review the details</h1>
             <p className="text-muted-foreground mt-4">Reference</p>
-            <p className="font-mono text-xl font-semibold mt-1">{confirmation}</p>
+             <p className="font-mono text-xl font-semibold mt-1">{confirmation.reference}</p>
+             {confirmation.photoStatus === 'uploading' && (
+               <Alert className="mt-6 text-left">
+                 <Loader2 className="h-4 w-4 animate-spin" />
+                 <AlertTitle>Adding your photos</AlertTitle>
+                 <AlertDescription>Your repair request is saved. We are securely attaching your selected photos now.</AlertDescription>
+               </Alert>
+             )}
+             {confirmation.photoStatus === 'warning' && (
+               <Alert className="mt-6 text-left border-amber-500/50 bg-amber-500/5">
+                 <AlertTitle>Photos still need attention</AlertTitle>
+                 <AlertDescription>
+                   <p>{confirmation.photoError}</p>
+                   <Button className="mt-3" size="sm" type="button" onClick={() => void uploadImages(confirmation)} disabled={!confirmation.uploadToken || photosUploading}>
+                     Retry photos
+                   </Button>
+                 </AlertDescription>
+               </Alert>
+             )}
+             {confirmation.photoStatus === 'complete' && (
+               <Alert className="mt-6 text-left border-primary/40 bg-primary/5">
+                 <CheckCircle2 className="h-4 w-4 text-primary" />
+                 <AlertTitle>Photos attached</AlertTitle>
+                 <AlertDescription>All selected photos were securely added to your repair request.</AlertDescription>
+               </Alert>
+             )}
             <div className="mt-6 rounded-md border border-border bg-muted/40 p-4 text-left text-sm text-muted-foreground space-y-2">
               <p>1. A team member reviews your watch details and photos.</p>
               <p>2. We contact you using your preferred method to discuss next steps.</p>

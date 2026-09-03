@@ -63,8 +63,10 @@ interface HeroMediaProps {
 }
 
 /**
- * Two-slot cinematic hero: only the active and upcoming variations are mounted.
- * The upcoming video starts during the final second and overlaps the active one.
+ * Fixed, site-wide cinematic layer: only the active and upcoming variations are
+ * mounted. The upcoming video starts during the final second and overlaps the
+ * active one. Public page content scrolls over this layer without exposing its
+ * bounds.
  */
 export function HeroMedia({ className }: HeroMediaProps) {
   const reducedMotion = usePrefersReducedMotion();
@@ -77,7 +79,7 @@ export function HeroMedia({ className }: HeroMediaProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const motionLayerRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef(new Map<number, HTMLVideoElement>());
-  const visibleRef = useRef(true);
+  const visibleRef = useRef(!document.hidden);
   const transitionTimerRef = useRef<number | undefined>(undefined);
   const orderRef = useRef(initialOrder);
   const cursorRef = useRef(2);
@@ -164,9 +166,8 @@ export function HeroMedia({ className }: HeroMediaProps) {
 
   useEffect(() => {
     if (reducedMotion || failed.size === HERO_VARIATIONS.length) return;
-    const container = containerRef.current;
     const motionLayer = motionLayerRef.current;
-    if (!container || !motionLayer) return;
+    if (!motionLayer) return;
 
     let frame = 0;
     const updateParallax = () => {
@@ -175,8 +176,8 @@ export function HeroMedia({ className }: HeroMediaProps) {
         motionLayer.style.transform = 'translate3d(0, 0, 0)';
         return;
       }
-      const scrollInsideHero = Math.max(0, -container.getBoundingClientRect().top);
-      motionLayer.style.transform = `translate3d(0, ${scrollInsideHero * 0.4}px, 0)`;
+      const drift = Math.sin(window.scrollY / 850) * 18;
+      motionLayer.style.transform = `translate3d(0, ${drift}px, 0)`;
     };
     const requestParallaxUpdate = () => {
       if (!frame) frame = window.requestAnimationFrame(updateParallax);
@@ -190,19 +191,19 @@ export function HeroMedia({ className }: HeroMediaProps) {
         }
       });
     };
-    const observer = new IntersectionObserver(([entry]) => {
-      visibleRef.current = entry.isIntersecting;
+    const handleVisibility = () => {
+      visibleRef.current = !document.hidden;
       syncPlayback();
-    }, { threshold: 0.01 });
+    };
 
-    observer.observe(container);
     if (!isMobile) window.addEventListener('scroll', requestParallaxUpdate, { passive: true });
+    document.addEventListener('visibilitychange', handleVisibility);
     updateParallax();
     syncPlayback();
 
     return () => {
-      observer.disconnect();
       if (!isMobile) window.removeEventListener('scroll', requestParallaxUpdate);
+      document.removeEventListener('visibilitychange', handleVisibility);
       if (frame) window.cancelAnimationFrame(frame);
     };
   }, [activeIndex, failed.size, isMobile, nextIndex, reducedMotion, transitioning]);
@@ -215,7 +216,7 @@ export function HeroMedia({ className }: HeroMediaProps) {
   return (
     <div
       ref={containerRef}
-      className={cn('absolute inset-0 overflow-hidden bg-background', className)}
+      className={cn('pointer-events-none fixed inset-0 overflow-hidden bg-background', className)}
       aria-hidden="true"
     >
       <WatchPoster className="absolute inset-0 h-full w-full" />
@@ -230,7 +231,7 @@ export function HeroMedia({ className }: HeroMediaProps) {
       ) : !noPlayableMedia ? (
         <div
           ref={motionLayerRef}
-          className="absolute -inset-x-[4%] -top-[15%] h-[130%] w-[108%] will-change-transform"
+          className="absolute -inset-x-[5%] -top-[13%] h-[126%] w-[110%] will-change-transform"
         >
           {[activeIndex, nextIndex].map((index) => {
             const variation = HERO_VARIATIONS[index];
@@ -270,8 +271,8 @@ export function HeroMedia({ className }: HeroMediaProps) {
         </div>
       ) : null}
 
-      <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/50 to-background" />
-      <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background/76 via-background/62 to-background/82" />
+      <div className="absolute inset-0 bg-gradient-to-r from-background/76 via-background/28 to-background/56" />
     </div>
   );
 }

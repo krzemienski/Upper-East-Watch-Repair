@@ -1137,6 +1137,80 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       return useMutation(getRequestLeadUploadUrlMutationOptions(options));
     }
 
+export const getUploadLeadAttachmentUrl = (id: number,
+    attachmentId: number,) => {
+
+
+
+
+  return `/api/leads/${id}/uploads/${attachmentId}`
+}
+
+/**
+ * @summary Upload bytes to a reserved private attachment target
+ */
+export const uploadLeadAttachment = async (id: number,
+    attachmentId: number,
+    uploadLeadAttachmentBody: Blob, options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getUploadLeadAttachmentUrl(id,attachmentId),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'image/jpeg', ...options?.headers },
+    body: uploadLeadAttachmentBody
+  }
+);}
+
+
+
+
+
+export const getUploadLeadAttachmentMutationOptions = <TError = ErrorType<BadRequestResponse | UnauthorizedResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadLeadAttachment>>, TError,{id: number;attachmentId: number;data: BodyType<Blob>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof uploadLeadAttachment>>, TError,{id: number;attachmentId: number;data: BodyType<Blob>}, TContext> => {
+
+const mutationKey = ['uploadLeadAttachment'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof uploadLeadAttachment>>, {id: number;attachmentId: number;data: BodyType<Blob>}> = (props) => {
+          const {id,attachmentId,data} = props ?? {};
+
+          return  uploadLeadAttachment(id,attachmentId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UploadLeadAttachmentMutationResult = NonNullable<Awaited<ReturnType<typeof uploadLeadAttachment>>>
+    export type UploadLeadAttachmentMutationBody = BodyType<Blob>
+    export type UploadLeadAttachmentMutationError = ErrorType<BadRequestResponse | UnauthorizedResponse>
+
+    /**
+ * @summary Upload bytes to a reserved private attachment target
+ */
+export const useUploadLeadAttachment = <TError = ErrorType<BadRequestResponse | UnauthorizedResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadLeadAttachment>>, TError,{id: number;attachmentId: number;data: BodyType<Blob>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof uploadLeadAttachment>>,
+        TError,
+        {id: number;attachmentId: number;data: BodyType<Blob>},
+        TContext
+      > => {
+      return useMutation(getUploadLeadAttachmentMutationOptions(options));
+    }
+
 export const getFinalizeLeadAttachmentUrl = (id: number,) => {
 
 

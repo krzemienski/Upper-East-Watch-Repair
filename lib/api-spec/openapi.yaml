@@ -279,10 +279,36 @@ paths:
             schema: { $ref: "#/components/schemas/UploadRequest" }
       responses:
         "200":
-          description: Presigned upload target
+          description: Reserved same-origin upload target
           content:
             application/json:
               schema: { $ref: "#/components/schemas/UploadTarget" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /leads/{id}/uploads/{attachmentId}:
+    put:
+      operationId: uploadLeadAttachment
+      tags: [leads]
+      summary: Upload bytes to a reserved private attachment target
+      parameters:
+        - $ref: "#/components/parameters/LeadId"
+        - $ref: "#/components/parameters/UploadToken"
+        - name: attachmentId
+          in: path
+          required: true
+          schema: { type: integer, format: int32 }
+        - name: Content-Length
+          in: header
+          required: true
+          schema: { type: integer, minimum: 1, maximum: 8388608 }
+      requestBody:
+        required: true
+        content:
+          image/jpeg: { schema: { type: string, format: binary } }
+          image/png: { schema: { type: string, format: binary } }
+          image/webp: { schema: { type: string, format: binary } }
+      responses:
+        "204": { description: Uploaded }
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
   /leads/{id}/attachments:
@@ -557,17 +583,21 @@ components:
         uploadTokenExpiresAt: { type: string, format: date-time }
     UploadRequest:
       type: object
-      required: [name, size, contentType]
+      required: [name, size, contentType, clientUploadId]
       properties:
         name: { type: string, minLength: 1, maxLength: 255 }
         size: { type: integer, minimum: 1, maximum: 8388608 }
         contentType: { type: string, enum: [image/jpeg, image/png, image/webp] }
+        clientUploadId: { type: string, format: uuid }
     UploadTarget:
       type: object
-      required: [uploadURL, objectPath]
+      required: [uploadURL, objectPath, attachmentId]
       properties:
-        uploadURL: { type: string, format: uri }
+        uploadURL:
+          type: string
+          description: Same-origin API path for the reserved upload.
         objectPath: { type: string }
+        attachmentId: { type: integer, format: int32 }
     AttachmentInput:
       allOf:
         - $ref: "#/components/schemas/UploadRequest"
@@ -577,14 +607,18 @@ components:
             objectPath: { type: string, pattern: "^/objects/repair-leads/[1-9][0-9]*/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$" }
     LeadAttachment:
       type: object
-      required: [id, leadId, objectPath, originalName, contentType, size, createdAt]
+      required: [id, leadId, objectPath, clientUploadId, originalName, contentType, size, expiresAt, createdAt]
       properties:
         id: { type: integer, format: int32 }
         leadId: { type: integer, format: int32 }
         objectPath: { type: string }
+        clientUploadId: { type: string, format: uuid }
         originalName: { type: string }
         contentType: { type: string }
         size: { type: integer }
+        expiresAt: { type: string, format: date-time }
+        uploadedAt: { type: [string, "null"], format: date-time }
+        finalizedAt: { type: [string, "null"], format: date-time }
         createdAt: { type: string, format: date-time }
     LeadEvent:
       type: object
@@ -664,8 +698,11 @@ components:
         byServiceNeeded: { type: object, additionalProperties: { type: integer } }
         metrics:
           type: object
-          required: [callClicks, directionsClicks, intakeSubmissions, watchesReceived, wonRepairs]
+          required: [ctaClicks, callClicks, directionsClicks, intakeSubmissions, watchesReceived, wonRepairs]
           properties:
+            ctaClicks:
+              type: integer
+              description: Total CTA clicks; equal to callClicks plus directionsClicks.
             callClicks: { type: integer }
             directionsClicks: { type: integer }
             intakeSubmissions: { type: integer }

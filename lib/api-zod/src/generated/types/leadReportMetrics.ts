@@ -7,6 +7,8 @@
  */
 
 export type LeadReportMetrics = {
+  /** Total CTA clicks; equal to callClicks plus directionsClicks. */
+  ctaClicks: number;
   callClicks: number;
   directionsClicks: number;
   intakeSubmissions: number;

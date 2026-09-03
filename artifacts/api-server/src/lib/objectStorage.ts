@@ -1,5 +1,4 @@
 import { Storage, type File } from "@google-cloud/storage";
-import { randomUUID } from "node:crypto";
 
 const SIDECAR = "http://127.0.0.1:1106";
 
@@ -31,31 +30,14 @@ function splitPath(path: string): { bucket: string; object: string } {
   return { bucket, object: parts.join("/") };
 }
 
-export async function createLeadUploadUrl(leadId: number): Promise<{
-  uploadURL: string;
-  objectPath: string;
-}> {
-  const id = randomUUID();
+export function createLeadObjectPath(leadId: number, id: string): string {
   if (!Number.isSafeInteger(leadId) || leadId <= 0) {
     throw new Error("Invalid lead id");
   }
-  const relativePath = `repair-leads/${leadId}/${id}`;
-  const fullPath = `${privateDir()}/${relativePath}`;
-  const { bucket, object } = splitPath(fullPath);
-  const response = await fetch(`${SIDECAR}/object-storage/signed-object-url`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      bucket_name: bucket,
-      object_name: object,
-      method: "PUT",
-      expires_at: new Date(Date.now() + 15 * 60_000).toISOString(),
-    }),
-    signal: AbortSignal.timeout(30_000),
-  });
-  if (!response.ok) throw new Error(`Unable to sign upload URL (${response.status})`);
-  const payload = (await response.json()) as { signed_url: string };
-  return { uploadURL: payload.signed_url, objectPath: `/objects/${relativePath}` };
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) {
+    throw new Error("Invalid upload id");
+  }
+  return `/objects/repair-leads/${leadId}/${id}`;
 }
 
 export async function getPrivateObject(
@@ -94,6 +76,38 @@ export async function inspectPrivateObject(
     contentType: String(metadata.contentType ?? ""),
     size: Number(metadata.size ?? 0),
   };
+}
+
+export async function writePrivateObject(
+  objectPath: string,
+  leadId: number,
+  body: Buffer,
+  contentType: string,
+): Promise<void> {
+  const file = await getPrivateObjectFile(objectPath, leadId);
+  await file.save(body, {
+    resumable: false,
+    metadata: { contentType },
+    preconditionOpts: { ifGenerationMatch: 0 },
+  });
+}
+
+export async function deletePrivateObject(objectPath: string, leadId: number): Promise<void> {
+  const file = await getPrivateObjectFile(objectPath, leadId);
+  await file.delete({ ignoreNotFound: true });
+}
+
+async function getPrivateObjectFile(objectPath: string, leadId: number): Promise<File> {
+  const expectedPrefix = `/objects/repair-leads/${leadId}/`;
+  if (
+    !Number.isSafeInteger(leadId) ||
+    leadId <= 0 ||
+    !objectPath.startsWith(expectedPrefix) ||
+    !/^\/objects\/repair-leads\/[1-9][0-9]*\/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(objectPath)
+  ) throw new Error("Invalid private object path");
+  const relative = objectPath.slice("/objects/".length);
+  const { bucket, object } = splitPath(`${privateDir()}/${relative}`);
+  return storage.bucket(bucket).file(object);
 }
 
 export async function pipePrivateObject(file: File, res: import("express").Response) {

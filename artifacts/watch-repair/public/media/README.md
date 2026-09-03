@@ -1,8 +1,10 @@
-# Homepage hero media inventory
+# Site-wide cinematic media inventory
 
-The homepage hero uses a fixed collection of four silent, seamless 1920×1080
-mechanical-watch loops. Each delivery has an H.264 MP4 fallback, a VP9 WebM
-primary source, and a matched eager-display JPEG poster.
+The public site uses a fixed-viewport collection of four silent, seamless
+1920×1080 mechanical-watch loops. The page scrolls over this persistent layer,
+so the movement remains subtly visible beyond the homepage hero. Each delivery
+has an H.264 MP4 fallback, a VP9 WebM primary source, and a matched eager-display
+JPEG poster.
 
 | Variation | Source / treatment | MP4 | WebM | Poster | Direction |
 | --- | --- | --- | --- | --- | --- |
@@ -20,8 +22,11 @@ use VP9 with row-based multithreading. Posters are JPEG quality level 3.
 shuffle bag, and mounts/preloads only the active and upcoming video. Both video
 layers share the same geometry, preventing layout shift or black frames during
 the one-second opacity crossfade.
-An `IntersectionObserver` pauses playback off-screen. Desktop retains the 0.4×
-scroll parallax; mobile remains fixed and uses muted inline autoplay.
+Playback pauses when the browser tab is hidden. Desktop applies a restrained
+oscillating vertical drift as the document scrolls while the oversized media
+layer stays fixed behind the full public site; mobile remains fixed and uses
+muted inline autoplay. Public content surfaces use token-based translucency so
+motion remains present without compromising legibility.
 
 For `prefers-reduced-motion`, no video is mounted: the original movement poster
 is shown without rotation or parallax. The token-driven `WatchPoster` remains

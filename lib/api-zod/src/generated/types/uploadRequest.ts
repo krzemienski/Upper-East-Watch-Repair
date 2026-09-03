@@ -19,4 +19,5 @@ export interface UploadRequest {
      */
   size: number;
   contentType: UploadRequestContentType;
+  clientUploadId: string;
 }

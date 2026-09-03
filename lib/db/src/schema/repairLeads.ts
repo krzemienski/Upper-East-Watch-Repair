@@ -7,6 +7,8 @@ import {
   serial,
   text,
   timestamp,
+  uniqueIndex,
+  uuid,
   varchar,
 } from "drizzle-orm/pg-core";
 
@@ -80,12 +82,23 @@ export const leadAttachmentsTable = pgTable(
       .notNull()
       .references(() => repairLeadsTable.id, { onDelete: "cascade" }),
     objectPath: text("object_path").notNull().unique(),
+    clientUploadId: uuid("client_upload_id").notNull(),
     originalName: varchar("original_name", { length: 255 }).notNull(),
     contentType: varchar("content_type", { length: 80 }).notNull(),
     size: integer("size").notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    uploadedAt: timestamp("uploaded_at", { withTimezone: true }),
+    finalizedAt: timestamp("finalized_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => [index("lead_attachments_lead_idx").on(table.leadId)],
+  (table) => [
+    index("lead_attachments_lead_idx").on(table.leadId),
+    index("lead_attachments_expiry_idx").on(table.expiresAt),
+    uniqueIndex("lead_attachments_lead_client_upload_idx").on(
+      table.leadId,
+      table.clientUploadId,
+    ),
+  ],
 );
 
 export const leadEventsTable = pgTable(
