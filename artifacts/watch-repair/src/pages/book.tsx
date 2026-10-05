@@ -13,6 +13,9 @@ import { Alert, AlertDescription, AlertTitle } from '@workspace/upper-east-horol
 import { PageMeta } from '@/components/PageMeta';
 import { Section } from '@/components/Section';
 import { ADDRESS_SINGLE_LINE, MAPS_URL } from '@/data/business';
+import { trackGoogleEvent } from '@/lib/google-analytics';
+
+type CalApi = (action: string, options: { action: string; callback: (event: { detail?: { data?: { uid?: string } } }) => void }) => void;
 
 const CAL_LINK = import.meta.env.VITE_CAL_LINK as string | undefined;
 
@@ -66,6 +69,26 @@ function CalEmbed({ calLink }: { calLink: string }) {
       Cal.ns.uew("ui", { hideEventTypeDetails: false, layout: "month_view" });
     `;
     document.body.appendChild(script);
+    const api = (window as unknown as { Cal?: { ns?: { uew?: CalApi } } }).Cal?.ns?.uew;
+    const bookings = new Set<string>();
+    const callbacks = [
+      { action: 'linkReady', callback: () => {
+        if (cancelled) return;
+        setLoaded(true);
+        trackGoogleEvent('booking_embed_loaded', { booking_provider: 'cal' });
+      } },
+      { action: 'linkFailed', callback: () => {
+        if (!cancelled) trackGoogleEvent('booking_embed_failed', { booking_provider: 'cal', error_type: 'embed_failed' });
+      } },
+      { action: 'bookingSuccessfulV2', callback: (event: { detail?: { data?: { uid?: string } } }) => {
+        const uid = event.detail?.data?.uid;
+        if (cancelled || !uid || bookings.has(uid)) return;
+        bookings.add(uid);
+        // UID is used only for local deduplication; never sent to analytics.
+        trackGoogleEvent('booking_completed', { booking_provider: 'cal' });
+      } },
+    ];
+    for (const callback of callbacks) api?.('on', callback);
 
     const t = setTimeout(() => {
       if (!cancelled) setLoaded(true);
@@ -74,6 +97,7 @@ function CalEmbed({ calLink }: { calLink: string }) {
     return () => {
       cancelled = true;
       clearTimeout(t);
+      for (const callback of callbacks) api?.('off', callback);
       script.remove();
     };
   }, [calLink]);
@@ -151,6 +175,9 @@ function CalFallback() {
 
 export default function BookPage() {
   const configured = !!CAL_LINK && CAL_LINK.trim().length > 0;
+  useEffect(() => {
+    trackGoogleEvent('booking_page_viewed', { booking_provider: 'cal', configured });
+  }, [configured]);
 
   return (
     <>

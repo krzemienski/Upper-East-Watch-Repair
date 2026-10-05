@@ -1,4 +1,5 @@
 import { trackEvent } from './analytics';
+import { trackGoogleEvent } from './google-analytics';
 
 export type FunnelVariant = 'consultation' | 'diagnosis';
 
@@ -11,17 +12,20 @@ declare global {
 const VARIANT_KEY = 'uewr_repair_variant';
 const CTA_KEY = 'uewr_repair_cta';
 const ATTRIBUTION_KEY = 'uewr_repair_attribution';
+let memoryVariant: FunnelVariant | undefined;
 
 export function getRepairVariant(): FunnelVariant {
-  const saved = localStorage.getItem(VARIANT_KEY);
-  if (saved === 'consultation' || saved === 'diagnosis') return saved;
-  const variant: FunnelVariant = Math.random() < 0.5 ? 'consultation' : 'diagnosis';
-  localStorage.setItem(VARIANT_KEY, variant);
-  return variant;
+  try {
+    const saved = localStorage.getItem(VARIANT_KEY);
+    if (saved === 'consultation' || saved === 'diagnosis') return saved;
+  } catch { /* Storage can be unavailable in private browsers. */ }
+  memoryVariant ??= Math.random() < 0.5 ? 'consultation' : 'diagnosis';
+  try { localStorage.setItem(VARIANT_KEY, memoryVariant); } catch { /* Optional persistence. */ }
+  return memoryVariant;
 }
 
 export function selectRepairCta(cta: string) {
-  sessionStorage.setItem(CTA_KEY, cta);
+  try { sessionStorage.setItem(CTA_KEY, cta); } catch { /* Tracking must not block navigation. */ }
   trackFunnelEvent('cta_clicked', { cta });
 }
 
@@ -42,12 +46,16 @@ export function getAttribution() {
     utmTerm: query.get('utm_term') || saved.utmTerm || undefined,
     utmContent: query.get('utm_content') || saved.utmContent || undefined,
   };
-  sessionStorage.setItem(ATTRIBUTION_KEY, JSON.stringify(campaign));
+  let selectedCta: string | undefined;
+  try {
+    sessionStorage.setItem(ATTRIBUTION_KEY, JSON.stringify(campaign));
+    selectedCta = sessionStorage.getItem(CTA_KEY) || undefined;
+  } catch { /* The form remains usable without storage. */ }
   return {
     ...campaign,
     device: /Mobi|Android/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
     variant: getRepairVariant(),
-    selectedCta: sessionStorage.getItem(CTA_KEY) || undefined,
+    selectedCta,
   };
 }
 
@@ -67,6 +75,7 @@ export function trackFunnelEvent(event: string, properties: Record<string, unkno
   if (typeof properties.inStore === 'boolean') analyticsData.in_store = properties.inStore;
   if (typeof properties.imageCount === 'number') analyticsData.photo_count = properties.imageCount;
   trackEvent(event, analyticsData);
+  trackGoogleEvent(event, analyticsData);
   try {
   const attribution = getAttribution();
   const body = JSON.stringify({
@@ -74,11 +83,6 @@ export function trackFunnelEvent(event: string, properties: Record<string, unkno
     ...attribution,
     metadata: { ...properties, path: window.location.pathname },
   });
-  try {
-    window.gtag?.('event', event, analyticsData);
-  } catch {
-    // Google Analytics failures must not block the database event.
-  }
   void fetch('/api/funnel-events', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent, type ReactNode } from 'react';
 import { Link, useLocation } from 'wouter';
 import { ArrowLeft, CheckCircle2, ImagePlus, Loader2, LockKeyhole, Store, X } from 'lucide-react';
 import { Button } from '@workspace/upper-east-horology/components/ui/button';
@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Alert, AlertDescription, AlertTitle } from '@workspace/upper-east-horology/components/ui/alert';
 import { PageMeta } from '@/components/PageMeta';
 import { getAttribution, trackFunnelEvent } from '@/lib/repair-funnel';
+import { trackGoogleEvent } from '@/lib/google-analytics';
 
 type IntakeState = {
   name: string;
@@ -64,6 +65,32 @@ export default function RepairIntakePage({ inStore = false }: { inStore?: boolea
   const [submitting, setSubmitting] = useState(false);
   const [confirmation, setConfirmation] = useState<ConfirmationState | null>(null);
   const [photosUploading, setPhotosUploading] = useState(false);
+  const formStarted = useRef(false);
+  const formComplete = useRef(false);
+  const formId = inStore ? 'in_store_repair' : 'online_repair';
+  function measureForm(event: string, properties: Record<string, string | number | boolean> = {}) {
+    trackGoogleEvent(event, { form_id: formId, in_store: inStore, ...properties });
+  }
+  function startForm() {
+    if (formStarted.current) return;
+    formStarted.current = true;
+    measureForm('repair_form_started');
+  }
+
+  useEffect(() => {
+    let reported = false;
+    const reportExit = () => {
+      if (!reported && formStarted.current && !formComplete.current) {
+        reported = true;
+        trackGoogleEvent('repair_form_abandoned', { form_id: formId, in_store: inStore });
+      }
+    };
+    window.addEventListener('pagehide', reportExit);
+    return () => {
+      window.removeEventListener('pagehide', reportExit);
+      reportExit();
+    };
+  }, [formId, inStore]);
 
   useEffect(() => {
     trackFunnelEvent(inStore ? 'in_store_intake_started' : 'repair_intake_started');
@@ -83,6 +110,9 @@ export default function RepairIntakePage({ inStore = false }: { inStore?: boolea
   );
 
   function set(name: keyof IntakeState, value: string) {
+    startForm();
+    if (name === 'serviceCategory') measureForm('repair_service_selected', { service_type: value });
+    if (name === 'preferredContact') measureForm('repair_contact_method_selected', { contact_method: value });
     setValues((current) => ({ ...current, [name]: value }));
   }
 
@@ -91,11 +121,16 @@ export default function RepairIntakePage({ inStore = false }: { inStore?: boolea
     const allowed = ['image/jpeg', 'image/png', 'image/webp'];
     const invalid = incoming.find((file) => !allowed.includes(file.type) || file.size > 8 * 1024 * 1024);
     if (invalid) {
+      measureForm('repair_photo_rejected', { error_type: invalid.size > 8 * 1024 * 1024 ? 'too_large' : 'unsupported_type' });
       setError('Each photo must be a JPG, PNG, or WebP file no larger than 8 MB.');
       event.target.value = '';
       return;
     }
     setError('');
+    if (incoming.length) {
+      startForm();
+      measureForm('repair_photos_selected', { photo_count: Math.min(files.length + incoming.length, 5) });
+    }
     const next = [...files, ...incoming.map((file) => ({ file, clientUploadId: crypto.randomUUID() }))].slice(0, 5);
     previews.forEach(URL.revokeObjectURL);
     setFiles(next);
@@ -104,6 +139,7 @@ export default function RepairIntakePage({ inStore = false }: { inStore?: boolea
   }
 
   function removeImage(index: number) {
+    measureForm('repair_photo_removed', { photo_count: files.length - 1 });
     URL.revokeObjectURL(previews[index]);
     const next = files.filter((_, i) => i !== index);
     setFiles(next);
@@ -113,6 +149,7 @@ export default function RepairIntakePage({ inStore = false }: { inStore?: boolea
   async function uploadImages(created: ConfirmationState) {
     if (photosUploading) return;
     if (!created.uploadToken) {
+      measureForm('repair_photos_failed', { error_type: 'missing_upload_authorization' });
       setConfirmation((current) => current ? {
         ...current,
         photoStatus: 'warning',
@@ -165,8 +202,11 @@ export default function RepairIntakePage({ inStore = false }: { inStore?: boolea
 
   async function submit(event: FormEvent) {
     event.preventDefault();
+    if (submitting || confirmation) return;
+    measureForm('repair_form_submit_attempt');
     setError('');
     if (!canSubmit) {
+      measureForm('repair_form_validation_error', { error_type: 'required_fields' });
       setError('Complete the required fields, provide phone or email, and confirm contact consent.');
       return;
     }
@@ -213,10 +253,13 @@ export default function RepairIntakePage({ inStore = false }: { inStore?: boolea
          photoStatus: files.length ? 'uploading' : 'not_needed',
        };
        setConfirmation(created);
+        formComplete.current = true;
+        measureForm('generate_lead', { service_type: values.serviceCategory, contact_method: values.preferredContact, photo_count: files.length });
        trackFunnelEvent('repair_intake_submitted', { leadId: created.leadId, inStore, imageCount: files.length });
       window.scrollTo({ top: 0, behavior: 'smooth' });
        if (files.length) void uploadImages(created);
     } catch (caught) {
+      measureForm('repair_form_submit_failed', { error_type: 'submission_failed' });
       setError(caught instanceof Error ? caught.message : 'Unable to submit your request.');
     } finally {
       setSubmitting(false);
@@ -306,7 +349,7 @@ export default function RepairIntakePage({ inStore = false }: { inStore?: boolea
           <h1 className="font-serif text-4xl sm:text-5xl font-semibold mt-2">Tell us about your watch</h1>
           <p className="text-muted-foreground mt-4">Required fields are marked with an asterisk. Details can be approximate.</p>
         </div>
-        <form onSubmit={submit} className="space-y-6">
+        <form onSubmit={submit} onChangeCapture={startForm} onInvalidCapture={() => measureForm('repair_form_validation_error', { error_type: 'invalid_field' })} className="space-y-6">
           <FormCard title="Your contact details">
             <Field label="Name *"><Input value={values.name} onChange={(e) => set('name', e.target.value)} autoComplete="name" required /></Field>
             <div className="grid sm:grid-cols-2 gap-5">

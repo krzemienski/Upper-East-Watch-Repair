@@ -4,6 +4,7 @@ import {
   type ErrorInfo,
   type ReactNode,
 } from 'react';
+import { trackGoogleEvent } from '@/lib/google-analytics';
 
 export interface ErrorFallbackProps {
   error: Error;
@@ -75,6 +76,7 @@ export class ErrorBoundary extends Component<
   }
 
   componentDidCatch(error: unknown, info: ErrorInfo): void {
+    trackGoogleEvent('site_error', { error_type: 'render_failed' });
     console.error(
       'ErrorBoundary caught an error:',
       toError(error),
@@ -92,6 +94,7 @@ export class ErrorBoundary extends Component<
   }
 
   resetError = (): void => {
+    if (this.state.error) trackGoogleEvent('site_error_retry');
     this.setState({ error: null });
   };
 

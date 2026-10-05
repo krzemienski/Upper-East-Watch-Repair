@@ -11,6 +11,7 @@ import {
 import { ErrorBoundary } from '@/components/error-boundary';
 import { SiteLayout } from '@/components/SiteLayout';
 import { LocalBusinessJsonLd } from '@/components/LocalBusinessJsonLd';
+import { SiteAnalytics } from '@/components/SiteAnalytics';
 import HomePage from '@/pages/home';
 import ServiceWatchRepairPage from '@/pages/service-watch-repair';
 import ServiceBatteryReplacementPage from '@/pages/service-battery-replacement';
@@ -87,6 +88,7 @@ function App() {
       <TooltipProvider>
         <LocalBusinessJsonLd />
         <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
+          <SiteAnalytics />
           <Router />
         </WouterRouter>
         <Toaster />

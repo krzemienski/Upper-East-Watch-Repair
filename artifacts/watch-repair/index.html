@@ -16,13 +16,18 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CHF9G5PYE4"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-CHF9G5PYE4');
-    </script>
+    <!-- GA4 is initialized by google-analytics.ts only on approved public production
+         routes, with sanitized URL/referrer overrides in place before the tag loads.
+         In GA4: Enhanced measurement > Page views > Show advanced settings >
+         "Page changes based on browser history events" MUST remain ON.
+         Initial/history page_view events are automatic; never send them manually.
+         Disable enhanced outbound clicks, downloads, form interactions and scrolls
+         in the GA4 stream: built-in link/form fields bypass our privacy allowlist.
+         Consent gap: this preserves existing analytics storage behavior, not a
+         consent-management solution. Review applicable consent requirements before
+         enabling additional tracking. Google signals/ad personalization are disabled.
+         References: developers.google.com/analytics/devguides/collection/ga4/views
+         and developers.google.com/analytics/devguides/collection/ga4/reference/config -->
   </head>
   <body>
     <div id="root"></div>
