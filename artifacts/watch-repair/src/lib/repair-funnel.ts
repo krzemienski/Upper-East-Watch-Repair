@@ -1,3 +1,5 @@
+import { trackEvent } from './analytics';
+
 export type FunnelVariant = 'consultation' | 'diagnosis';
 
 declare global {
@@ -50,24 +52,40 @@ export function getAttribution() {
 }
 
 export function trackFunnelEvent(event: string, properties: Record<string, unknown> = {}) {
+  // Only explicitly approved dimensions go to third-party analytics.
+  // Never forward lead IDs, query strings, referrers, or arbitrary form values.
+  const analyticsData: Record<string, string | number | boolean> = {};
+  try {
+    analyticsData.variant = getRepairVariant();
+  } catch {
+    // Restricted browser storage must not block tracking or submission.
+  }
+  if (typeof properties.cta === 'string' &&
+      ['call', 'call_request', 'online_intake', 'directions', 'directions_footer'].includes(properties.cta)) {
+    analyticsData.cta = properties.cta;
+  }
+  if (typeof properties.inStore === 'boolean') analyticsData.in_store = properties.inStore;
+  if (typeof properties.imageCount === 'number') analyticsData.photo_count = properties.imageCount;
+  trackEvent(event, analyticsData);
+  try {
   const attribution = getAttribution();
   const body = JSON.stringify({
     event,
     ...attribution,
     metadata: { ...properties, path: window.location.pathname },
   });
-  window.gtag?.('event', event, {
-    ...properties,
-    source: attribution.source,
-    campaign: attribution.utmCampaign,
-    variant: attribution.variant,
-    selected_cta: attribution.selectedCta,
-    page_path: window.location.pathname,
-  });
+  try {
+    window.gtag?.('event', event, analyticsData);
+  } catch {
+    // Google Analytics failures must not block the database event.
+  }
   void fetch('/api/funnel-events', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body,
     keepalive: true,
   }).catch(() => undefined);
+  } catch {
+    // Storage restrictions and analytics failures must not affect the form.
+  }
 }

@@ -150,7 +150,9 @@ export default function RepairIntakePage({ inStore = false }: { inStore?: boolea
       if (!attachment.ok) throw new Error('Your request was saved, but a photo could not be attached.');
       }
       setConfirmation((current) => current ? { ...current, photoStatus: 'complete', photoError: undefined } : current);
+      trackFunnelEvent('repair_photos_attached', { inStore, imageCount: created.files.length });
     } catch {
+      trackFunnelEvent('repair_photos_failed', { inStore, imageCount: created.files.length });
       setConfirmation((current) => current ? {
         ...current,
         photoStatus: 'warning',
@@ -246,7 +248,10 @@ export default function RepairIntakePage({ inStore = false }: { inStore?: boolea
                  <AlertTitle>Photos still need attention</AlertTitle>
                  <AlertDescription>
                    <p>{confirmation.photoError}</p>
-                   <Button className="mt-3" size="sm" type="button" onClick={() => void uploadImages(confirmation)} disabled={!confirmation.uploadToken || photosUploading}>
+                    <Button className="mt-3" size="sm" type="button" onClick={() => {
+                      trackFunnelEvent('repair_photos_retry_clicked', { inStore, imageCount: confirmation.files.length });
+                      void uploadImages(confirmation);
+                    }} disabled={!confirmation.uploadToken || photosUploading}>
                      Retry photos
                    </Button>
                  </AlertDescription>
