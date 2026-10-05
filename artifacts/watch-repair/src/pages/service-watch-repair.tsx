@@ -17,6 +17,7 @@ import {
 import { PageMeta } from '@/components/PageMeta';
 import { ServiceHero } from '@/components/ServiceHero';
 import { Section, SectionHeading } from '@/components/Section';
+import { AddressLink } from '@/components/ContactLinks';
 
 const capabilities = [
   {
@@ -156,15 +157,16 @@ export default function ServiceWatchRepairPage() {
             Ready to get your watch running?
           </h2>
           <p className="mt-4 text-muted-foreground">
-            Book a time or walk in during shop hours at 233 East 84th Street.
+            Book a time or walk in during shop hours at{' '}
+            <AddressLink testId="link-watch-address" />.
           </p>
           <div className="mt-8 flex flex-wrap gap-3 justify-center">
-            <Link href="/repair/intake">
-              <Button size="lg" data-testid="button-watch-book">
-                Start a Repair Request
+            <Button size="lg" asChild>
+              <Link href="/repair/intake" data-testid="button-watch-book">
+                Start repair quote
                 <ArrowRight className="h-4 w-4 ml-1" />
-              </Button>
-            </Link>
+              </Link>
+            </Button>
             <Link href="/services/battery-replacement">
               <Button size="lg" variant="outline" data-testid="button-watch-battery">
                 Need a battery instead?

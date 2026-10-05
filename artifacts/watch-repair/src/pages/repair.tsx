@@ -14,15 +14,14 @@ import { Badge } from '@workspace/upper-east-horology/components/ui/badge';
 import { Card, CardContent } from '@workspace/upper-east-horology/components/ui/card';
 import { PageMeta } from '@/components/PageMeta';
 import { Section, SectionHeading } from '@/components/Section';
-import { ADDRESS_SINGLE_LINE, MAPS_URL } from '@/data/business';
+import { ADDRESS_SINGLE_LINE, MAPS_URL, TEL_URL } from '@/data/business';
+import { AddressLink } from '@/components/ContactLinks';
 import {
   getRepairVariant,
   selectRepairCta,
   trackFunnelEvent,
   type FunnelVariant,
 } from '@/lib/repair-funnel';
-
-const BUSINESS_PHONE = (import.meta.env.VITE_BUSINESS_PHONE as string | undefined)?.trim();
 
 export default function RepairPage() {
   const [variant] = useState<FunnelVariant>(() => getRepairVariant());
@@ -37,14 +36,14 @@ export default function RepairPage() {
       : 'A stopped watch deserves a precise diagnosis.';
   const subhead =
     variant === 'consultation'
-      ? 'Start with a few details and photos. Our repair team will review your watch and contact you about the right next step.'
+      ? 'Start with a few details. Our repair team will review your watch and contact you about the right next step.'
       : 'From batteries to complete mechanical service, get your repair in front of an experienced Upper East Side watchmaker.';
 
   return (
     <>
       <PageMeta
         title="Start a Watch Repair | Upper East Watch Repair"
-        description="Request a watch repair assessment online, call our Upper East Side shop, or visit us at 233 East 84th Street."
+        description="Start a watch repair quote online, call our Upper East Side shop, or visit us at 233 East 84th Street."
       />
       <section className="relative overflow-hidden border-b border-border bg-card">
         <div className="absolute inset-0 opacity-40 [background:radial-gradient(circle_at_80%_20%,hsl(var(--primary)/.22),transparent_38%)]" />
@@ -61,29 +60,23 @@ export default function RepairPage() {
               {subhead}
             </p>
             <div className="mt-9 flex flex-col sm:flex-row gap-3">
-              <Link href="/repair/intake" onClick={() => selectRepairCta('online_intake')}>
-                <Button size="lg" className="w-full sm:w-auto" data-testid="repair-start-intake">
-                  Start repair request <ArrowRight className="h-4 w-4 ml-1" />
-                </Button>
-              </Link>
-              {BUSINESS_PHONE ? (
-                <a href={`tel:${BUSINESS_PHONE}`} onClick={() => selectRepairCta('call')}>
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto">
-                    <Phone className="h-4 w-4 mr-1.5" /> Call the shop
-                  </Button>
-                </a>
-              ) : (
-                <Link href="/repair/intake?contact=phone" onClick={() => selectRepairCta('call_request')}>
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto">
-                    <Phone className="h-4 w-4 mr-1.5" /> Request a call
-                  </Button>
+              <Button size="lg" className="w-full sm:w-auto" asChild>
+                <Link href="/repair/intake" onClick={() => selectRepairCta('online_intake')} data-testid="repair-start-intake">
+                  Start repair quote <ArrowRight className="h-4 w-4 ml-1" />
                 </Link>
-              )}
-              <a href={MAPS_URL} target="_blank" rel="noreferrer" onClick={() => selectRepairCta('directions')}>
-                <Button size="lg" variant="outline" className="w-full sm:w-auto">
-                  <MapPin className="h-4 w-4 mr-1.5" /> Directions
+              </Button>
+              {TEL_URL && (
+                <Button size="lg" variant="outline" className="w-full sm:w-auto" asChild>
+                  <a href={TEL_URL} onClick={() => selectRepairCta('call')} data-testid="repair-call-shop">
+                    <Phone className="h-4 w-4 mr-1.5" /> Call the shop
+                  </a>
                 </Button>
-              </a>
+              )}
+              <Button size="lg" variant="outline" className="w-full sm:w-auto" asChild>
+                <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" onClick={() => selectRepairCta('directions')} data-testid="repair-directions">
+                  <MapPin className="h-4 w-4 mr-1.5" /> Directions
+                </a>
+              </Button>
             </div>
             <p className="mt-4 text-xs text-muted-foreground">
               No obligation. Submitting details does not mean we have received your watch.
@@ -96,12 +89,12 @@ export default function RepairPage() {
         <SectionHeading
           eyebrow="A clearer first step"
           title="A thoughtful assessment starts before the bench"
-          description="Share what you know. Photos and reference numbers are helpful, but never required."
+          description="Share what you know. A brand and a short description of the problem are all we need to begin."
         />
         <div className="mt-10 grid md:grid-cols-3 gap-5">
           {[
             [Clock3, 'Takes about 3 minutes', 'Tell us the symptoms, urgency, and best way to reach you.'],
-            [ShieldCheck, 'Private by default', 'Your contact details and watch photos are used only to handle your request.'],
+            [ShieldCheck, 'Private by default', 'Your contact details are used only to handle your request.'],
             [CheckCircle2, 'Clear next steps', 'You receive a reference number and our team follows up before any work begins.'],
           ].map(([Icon, title, copy]) => (
             <Card key={String(title)}>
@@ -121,12 +114,14 @@ export default function RepairPage() {
             <p className="text-xs uppercase tracking-[.2em] text-primary font-semibold">Visit the workshop</p>
             <h2 className="font-serif text-3xl font-semibold mt-2">Prefer to speak in person?</h2>
             <p className="text-muted-foreground mt-3">
-              Walk in at {ADDRESS_SINGLE_LINE}. We will inspect your watch and provide a quote before work begins.
+              Walk in at <AddressLink testId="link-repair-address">{ADDRESS_SINGLE_LINE}</AddressLink>. We will inspect your watch and provide a quote before work begins.
             </p>
           </div>
-          <a href={MAPS_URL} target="_blank" rel="noreferrer" onClick={() => selectRepairCta('directions_footer')}>
-            <Button size="lg" variant="outline"><MapPin className="h-4 w-4 mr-2" /> Get directions</Button>
-          </a>
+          <Button size="lg" variant="outline" asChild>
+            <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" onClick={() => selectRepairCta('directions_footer')} data-testid="repair-directions-footer">
+              <MapPin className="h-4 w-4 mr-2" /> Get directions
+            </a>
+          </Button>
         </div>
       </Section>
     </>

@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@workspace/upper-east-horology/components/ui/toaster';
 import { TooltipProvider } from '@workspace/upper-east-horology/components/ui/tooltip';
 import {
+  Redirect,
   Route,
   Switch,
   useLocation,
@@ -15,7 +16,6 @@ import { SiteAnalytics } from '@/components/SiteAnalytics';
 import HomePage from '@/pages/home';
 import ServiceWatchRepairPage from '@/pages/service-watch-repair';
 import ServiceBatteryReplacementPage from '@/pages/service-battery-replacement';
-import ServiceJewelryRepairPage from '@/pages/service-jewelry-repair';
 import AboutPage from '@/pages/about';
 import BookPage from '@/pages/book';
 import GuidesIndexPage from '@/pages/guides-index';
@@ -44,7 +44,9 @@ function SiteRoutes() {
         <Route path="/" component={HomePage} />
         <Route path="/services/watch-repair" component={ServiceWatchRepairPage} />
         <Route path="/services/battery-replacement" component={ServiceBatteryReplacementPage} />
-        <Route path="/services/jewelry-repair" component={ServiceJewelryRepairPage} />
+        {/* Jewelry repair is no longer offered; keep old links landing on watch repair. */}
+        <Route path="/services/jewelry-repair"><Redirect to="/services/watch-repair" replace /></Route>
+        <Route path="/guides/jewelry-repair-cost-nyc"><Redirect to="/services/watch-repair" replace /></Route>
         <Route path="/about" component={AboutPage} />
         <Route path="/book" component={BookPage} />
         <Route path="/repair" component={RepairPage} />

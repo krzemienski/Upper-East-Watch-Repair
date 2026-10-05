@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { SHARE_IMAGE_URL, SITE_URL } from '@/data/business';
 
 interface PageMetaProps {
   title: string;
@@ -7,8 +8,10 @@ interface PageMetaProps {
   image?: string;
 }
 
-export function PageMeta({ title, description, canonical, image }: PageMetaProps) {
+export function PageMeta({ title, description, canonical: canonicalProp, image: imageProp }: PageMetaProps) {
   useEffect(() => {
+    const canonical = canonicalProp ?? `${SITE_URL}${window.location.pathname.replace(/\/$/, '') || '/'}`;
+    const image = imageProp ?? SHARE_IMAGE_URL;
     const fullTitle = title.includes('Upper East')
       ? title
       : `${title} | Upper East Watch Repair`;
@@ -86,7 +89,7 @@ export function PageMeta({ title, description, canonical, image }: PageMetaProps
       ogImage.content = image;
       setNamedMeta('twitter:image', image);
     }
-  }, [title, description, canonical, image]);
+  }, [title, description, canonicalProp, imageProp]);
 
   return null;
 }

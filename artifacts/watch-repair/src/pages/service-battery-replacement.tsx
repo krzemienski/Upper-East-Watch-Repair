@@ -17,6 +17,7 @@ import {
 import { PageMeta } from '@/components/PageMeta';
 import { ServiceHero } from '@/components/ServiceHero';
 import { Section, SectionHeading } from '@/components/Section';
+import { AddressLink } from '@/components/ContactLinks';
 
 const steps = [
   {
@@ -57,7 +58,7 @@ const included = [
 const faqs = [
   {
     q: 'How much does a battery replacement cost?',
-    a: 'Battery replacement ranges from $12 to $20 depending on the complexity of the watch — some cases and movements require more careful handling. We confirm the exact price before we begin.',
+    a: 'Battery replacement ranges from $15 to $50 depending on the complexity of the watch — some cases and movements require more careful handling. We confirm the exact price before we begin.',
   },
   {
     q: 'Do you test water resistance?',
@@ -78,12 +79,12 @@ export default function ServiceBatteryReplacementPage() {
     <>
       <PageMeta
         title="Battery Replacement | Upper East Watch Repair"
-        description="Swiss battery replacement from $12 to $20 with water-resistance testing at 233 East 84th Street. Genuine batteries, movement inspection, and most watches done while you wait."
+        description="Swiss battery replacement from $15 to $50 with water-resistance testing at 233 East 84th Street. Genuine batteries, movement inspection, and most watches done while you wait."
       />
       <ServiceHero
         eyebrow="Battery Replacement"
         title="Swiss batteries, done right"
-        description="A fresh battery is the most common watch service — and one we take seriously. Genuine Swiss batteries, water-resistance care, and honest pricing from $12 to $20 depending on watch complexity."
+        description="A fresh battery is the most common watch service — and one we take seriously. Genuine Swiss batteries, water-resistance care, and honest pricing from $15 to $50 depending on watch complexity."
       />
 
       {/* PRICING BANNER */}
@@ -94,7 +95,7 @@ export default function ServiceBatteryReplacementPage() {
               Transparent pricing
             </p>
             <p className="font-serif text-4xl font-semibold text-foreground">
-              $12 <span className="text-muted-foreground text-2xl">–</span> $20
+              $15 <span className="text-muted-foreground text-2xl">–</span> $50
             </p>
             <p className="mt-2 text-sm text-muted-foreground">
               Depending on watch complexity. Confirmed before any work begins.
@@ -170,7 +171,8 @@ export default function ServiceBatteryReplacementPage() {
             Stop in for a fresh battery
           </h2>
           <p className="mt-4 text-muted-foreground">
-            Walk in during shop hours or book ahead. We're at 233 East 84th Street.
+            Walk in during shop hours or book ahead. We're at{' '}
+            <AddressLink testId="link-battery-address" />.
           </p>
           <div className="mt-8 flex flex-wrap gap-3 justify-center">
             <Link href="/book">

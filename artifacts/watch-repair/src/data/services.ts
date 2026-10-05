@@ -23,29 +23,15 @@ export const services: ServiceItem[] = [
   },
   {
     title: 'Battery Replacement',
-    description: 'Swiss batteries, professional testing, and water-resistance care — from $12 to $20 depending on watch complexity.',
+    description: 'Swiss batteries, professional testing, and water-resistance care — from $15 to $50 depending on watch complexity.',
     details: [
       'Genuine Swiss batteries',
       'Water-resistance pressure test',
       'Movement inspection included',
       'Most watches completed while you wait',
-      'Starting from $12',
+      'Starting from $15',
     ],
     href: '/services/battery-replacement',
     ctaLabel: 'Battery replacement details',
-  },
-  {
-    title: 'Jewelry Repair',
-    description: 'Expert repair for fine jewelry — rings, chains, and settings handled with the same precision as our finest timepieces.',
-    details: [
-      'Ring resizing — up or down',
-      'Chain and clasp repair',
-      'Diamond and stone replacement',
-      'Prong retipping and rebuilding',
-      'Rhodium plating',
-      'Clasp replacement and soldering',
-    ],
-    href: '/services/jewelry-repair',
-    ctaLabel: 'Explore jewelry repair',
   },
 ];

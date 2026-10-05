@@ -1,7 +1,8 @@
 import { Link } from 'wouter';
-import { MapPin, Clock } from 'lucide-react';
+import { MapPin, Clock, Phone } from 'lucide-react';
 import { Separator } from '@workspace/upper-east-horology/components/ui/separator';
 import { Logo } from '@/components/Logo';
+import { AddressLink, PhoneLink } from '@/components/ContactLinks';
 import {
   ADDRESS_LOCALITY,
   ADDRESS_REGION,
@@ -10,6 +11,7 @@ import {
   MAPS_URL,
   POSTAL_CODE,
   STREET_ADDRESS,
+  TEL_URL,
 } from '@/data/business';
 
 export function SiteFooter() {
@@ -53,8 +55,16 @@ export function SiteFooter() {
               </span>
             </div>
             <address className="not-italic text-sm text-muted-foreground leading-relaxed mb-4">
-              {STREET_ADDRESS}<br />
-              {ADDRESS_LOCALITY}, {ADDRESS_REGION} {POSTAL_CODE}
+              <AddressLink testId="footer-link-address">
+                {STREET_ADDRESS}<br />
+                {ADDRESS_LOCALITY}, {ADDRESS_REGION} {POSTAL_CODE}
+              </AddressLink>
+              {TEL_URL && (
+                <span className="mt-2 flex items-center gap-2">
+                  <Phone className="h-3.5 w-3.5 text-primary" />
+                  <PhoneLink testId="footer-link-phone" />
+                </span>
+              )}
             </address>
             <a
               href={MAPS_URL}
@@ -70,7 +80,6 @@ export function SiteFooter() {
               {[
                 { href: '/services/watch-repair', label: 'Watch Repair' },
                 { href: '/services/battery-replacement', label: 'Battery Replacement' },
-                { href: '/services/jewelry-repair', label: 'Jewelry Repair' },
                 { href: '/guides', label: 'Watch Care Guides' },
                 { href: '/about', label: 'About the Shop' },
                 { href: '/book', label: 'Book Appointment' },
@@ -92,7 +101,7 @@ export function SiteFooter() {
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
           <p>&copy; {new Date().getFullYear()} Upper East Watch Repair. All rights reserved.</p>
-          <p>{ADDRESS_SINGLE_LINE}</p>
+          <AddressLink testId="footer-link-address-line">{ADDRESS_SINGLE_LINE}</AddressLink>
         </div>
       </div>
     </footer>

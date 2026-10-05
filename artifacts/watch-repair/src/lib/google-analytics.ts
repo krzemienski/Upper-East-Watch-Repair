@@ -30,7 +30,6 @@ const PUBLIC_ROUTES = {
   '/repair/intake/in-store': 'repair_intake_in_store',
   '/services/watch-repair': 'watch_repair',
   '/services/battery-replacement': 'battery_replacement',
-  '/services/jewelry-repair': 'jewelry_repair',
   '/guides': 'guides',
 } as const;
 
@@ -114,11 +113,11 @@ const CLICK_KEYS = new Set(['gclid', 'dclid', 'wbraid', 'gbraid']);
 // Static, reviewed UI identifiers only; never harvest arbitrary test IDs.
 const ACTION_IDS = new Set([
   'button-mobile-menu', 'button-watch-book', 'button-watch-battery',
-  'button-jewelry-book', 'button-jewelry-watch', 'button-battery-book',
+  'button-battery-book',
   'button-battery-repair', 'button-back-guides', 'button-all-guides',
   'button-guide-book', 'button-hero-book', 'button-hero-services',
   'button-process-book', 'button-more-story', 'button-cta-book',
-  'button-cta-directions', 'button-about-book', 'button-directions',
+  'button-cta-directions', 'button-cta-call', 'link-book-call', 'link-book-quote', 'repair-call-shop', 'button-about-book', 'button-directions',
   'button-book-intake', 'button-book-services', 'button-service-book',
   'button-service-visit', 'nav-book-appointment', 'mobile-nav-book',
   'repair-start-intake',

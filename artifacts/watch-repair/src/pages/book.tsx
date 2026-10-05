@@ -12,7 +12,8 @@ import {
 import { Alert, AlertDescription, AlertTitle } from '@workspace/upper-east-horology/components/ui/alert';
 import { PageMeta } from '@/components/PageMeta';
 import { Section } from '@/components/Section';
-import { ADDRESS_SINGLE_LINE, MAPS_URL } from '@/data/business';
+import { ADDRESS_SINGLE_LINE, BUSINESS_PHONE, MAPS_URL, TEL_URL } from '@/data/business';
+import { AddressLink } from '@/components/ContactLinks';
 import { trackGoogleEvent } from '@/lib/google-analytics';
 
 type CalApi = (action: string, options: { action: string; callback: (event: { detail?: { data?: { uid?: string } } }) => void }) => void;
@@ -160,13 +161,25 @@ function CalFallback() {
               </p>
             </div>
           </a>
-          <div className="rounded-md border border-border p-4">
-            <Phone className="h-5 w-5 text-primary mb-2" />
-            <p className="font-medium text-foreground">Call the shop</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              Reach us during shop hours to schedule a repair.
-            </p>
-          </div>
+          {TEL_URL ? (
+            <a href={TEL_URL} className="block" data-testid="link-book-call">
+              <div className="rounded-md border border-border p-4 hover-elevate h-full">
+                <Phone className="h-5 w-5 text-primary mb-2" />
+                <p className="font-medium text-foreground">Call the shop</p>
+                <p className="text-sm text-muted-foreground mt-1">{BUSINESS_PHONE}</p>
+              </div>
+            </a>
+          ) : (
+            <Link href="/repair/intake" className="block" data-testid="link-book-quote">
+              <div className="rounded-md border border-border p-4 hover-elevate h-full">
+                <Phone className="h-5 w-5 text-primary mb-2" />
+                <p className="font-medium text-foreground">Start repair quote</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Share a few details and we will contact you during shop hours.
+                </p>
+              </div>
+            </Link>
+          )}
         </div>
       </CardContent>
     </Card>
@@ -183,7 +196,7 @@ export default function BookPage() {
     <>
       <PageMeta
         title="Book an Appointment | Upper East Watch Repair"
-        description="Book a watch or jewelry repair appointment at Upper East Watch Repair, 233 East 84th Street, Manhattan. Reserve a time online or walk in during shop hours."
+        description="Book a watch repair appointment at Upper East Watch Repair, 233 East 84th Street, Manhattan. Reserve a time online or walk in during shop hours."
       />
 
       <Section className="pt-12 lg:pt-16">
@@ -203,8 +216,8 @@ export default function BookPage() {
             Book your appointment
           </h1>
           <p className="mt-5 text-lg text-muted-foreground leading-relaxed">
-            Choose a time that works for you and bring your watch or jewelry in for
-            assessment. Prefer to walk in? We're at 233 East 84th Street during shop hours.
+            Choose a time that works for you and bring your watch in for assessment.
+            Prefer to walk in? We're at <AddressLink testId="link-book-address" /> during shop hours.
           </p>
         </div>
 
@@ -213,12 +226,12 @@ export default function BookPage() {
         </div>
 
         <div className="mt-10 flex flex-wrap items-center gap-4">
-          <Link href="/repair/intake">
-            <Button data-testid="button-book-intake">
-              Start repair intake
+          <Button asChild>
+            <Link href="/repair/intake" data-testid="button-book-intake">
+              Start repair quote
               <ChevronRight className="h-4 w-4 ml-1" />
-            </Button>
-          </Link>
+            </Link>
+          </Button>
           <Link href="/services/watch-repair">
             <Button variant="outline" data-testid="button-book-services">
               Review our services

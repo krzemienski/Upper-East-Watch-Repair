@@ -10,7 +10,6 @@ const navLinks = [
   { href: '/repair', label: 'Start a Repair' },
   { href: '/services/watch-repair', label: 'Watch Repair' },
   { href: '/services/battery-replacement', label: 'Battery' },
-  { href: '/services/jewelry-repair', label: 'Jewelry' },
   { href: '/guides', label: 'Guides' },
   { href: '/about', label: 'About' },
 ];
@@ -54,11 +53,11 @@ export function SiteNav() {
 
         {/* CTA */}
         <div className="hidden md:flex items-center gap-3">
-          <Link href="/repair/intake">
-            <Button size="sm" data-testid="nav-book-appointment">
-              Repair Intake
-            </Button>
-          </Link>
+          <Button size="sm" asChild>
+            <Link href="/repair/intake" data-testid="nav-book-appointment">
+              Start repair quote
+            </Link>
+          </Button>
         </div>
 
         {/* Mobile menu button */}
@@ -99,11 +98,11 @@ export function SiteNav() {
               );
             })}
             <li className="pt-2">
-              <Link href="/repair/intake" onClick={() => setMobileOpen(false)}>
-                <Button className="w-full" data-testid="mobile-nav-book">
-                  Start Repair Intake
-                </Button>
-              </Link>
+              <Button className="w-full" asChild>
+                <Link href="/repair/intake" onClick={() => setMobileOpen(false)} data-testid="mobile-nav-book">
+                  Start repair quote
+                </Link>
+              </Button>
             </li>
           </ul>
         </div>

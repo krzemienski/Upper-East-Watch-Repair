@@ -16,29 +16,14 @@ export const testimonials: Testimonial[] = [
     service: 'Battery Replacement',
   },
   {
-    name: 'Claudia M.',
-    text: 'My engagement ring had a loose prong that was terrifying me. They fixed it same day and the setting looks brand new. Honest pricing, zero upsell.',
-    service: 'Jewelry Repair',
-  },
-  {
     name: 'David K.',
     text: 'I sent in a Patek Philippe for a full service. The movement came back better than when it left the manufacturer — cleaned, lubricated, timing perfect on all positions. Truly rare craftsmanship.',
     service: 'High-End Mechanical',
   },
   {
-    name: 'Susan L.',
-    text: 'Resized my mother\'s gold band for my daughter\'s wedding. They matched the finish exactly. You cannot tell it was ever altered. Exceptional work.',
-    service: 'Ring Resizing',
-  },
-  {
     name: 'Thomas B.',
     text: 'Dropped off a TAG Heuer with a cracked crystal. Ready the next morning, flawless crystal and the bezel looks like new. Pricing was exactly what they quoted, no surprises.',
     service: 'Crystal Replacement',
-  },
-  {
-    name: 'Anita V.',
-    text: 'My gold chain had a broken clasp and a snapped link. They repaired both invisibly — the solder is seamless. Picked it up the same afternoon I dropped it off.',
-    service: 'Chain Repair',
   },
   {
     name: 'Robert F.',

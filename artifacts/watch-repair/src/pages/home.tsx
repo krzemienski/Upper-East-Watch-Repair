@@ -3,7 +3,6 @@ import {
   Clock,
   ShieldCheck,
   MapPin,
-  Gem,
   BatteryCharging,
   Watch,
   ArrowRight,
@@ -23,9 +22,10 @@ import { WatchPoster } from '@/components/WatchPoster';
 import { Section, SectionHeading } from '@/components/Section';
 import { services } from '@/data/services';
 import { testimonials } from '@/data/testimonials';
-import { MAPS_URL } from '@/data/business';
+import { MAPS_URL, TEL_URL } from '@/data/business';
+import { AddressLink } from '@/components/ContactLinks';
 
-const serviceIcons = [Watch, BatteryCharging, Gem];
+const serviceIcons = [Watch, BatteryCharging];
 
 const trustPoints = [
   {
@@ -54,33 +54,35 @@ export default function HomePage() {
   return (
     <>
       <PageMeta
-        title="Upper East Watch Repair | Trusted Watch & Jewelry Repair on the Upper East Side"
-        description="Precision watch and jewelry repair at 233 East 84th Street, Manhattan. Mechanical and quartz repair, Swiss battery replacement, ring resizing, and fine jewelry repair — all brands."
+        title="Upper East Watch Repair | Trusted Watch Repair on the Upper East Side"
+        description="Precision watch repair at 233 East 84th Street, Manhattan. Mechanical and quartz repair, Swiss battery replacement from $15 to $50, and crystal, crown, and bracelet work — all brands."
       />
 
       {/* HERO */}
       <section className="relative min-h-[88vh] flex items-center border-b border-border">
         <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-24 w-full">
           <div className="max-w-2xl">
-            <Badge variant="outline" className="mb-6 backdrop-blur-sm" data-testid="badge-location">
-              <MapPin className="h-3 w-3 mr-1.5" />
-              233 East 84th Street, Manhattan
-            </Badge>
+            <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="inline-flex mb-6" data-testid="badge-location">
+              <Badge variant="outline" className="backdrop-blur-sm hover:border-primary transition-colors">
+                <MapPin className="h-3 w-3 mr-1.5" />
+                233 East 84th Street, Manhattan
+              </Badge>
+            </a>
             <h1 className="font-serif text-5xl sm:text-6xl lg:text-7xl font-semibold text-foreground leading-[1.02] tracking-tight">
               Precision for the pieces you never take off.
             </h1>
             <p className="mt-6 text-lg sm:text-xl text-muted-foreground leading-relaxed max-w-xl">
-              A trusted Upper East Side repair bench for fine watches and jewelry.
-              Mechanical overhauls, Swiss batteries, and delicate jewelry work — done
-              with the care your timepiece deserves.
+              A trusted Upper East Side repair bench for fine watches. Mechanical
+              overhauls, Swiss batteries, crystals, and bracelets — done with the care
+              your timepiece deserves.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
-              <Link href="/repair/intake">
-                <Button size="lg" data-testid="button-hero-book">
-                  Start a Repair Request
+              <Button size="lg" asChild>
+                <Link href="/repair/intake" data-testid="button-hero-book">
+                  Start repair quote
                   <ArrowRight className="h-4 w-4 ml-1" />
-                </Button>
-              </Link>
+                </Link>
+              </Button>
               <Link href="/services/watch-repair">
                 <Button size="lg" variant="outline" className="backdrop-blur-sm" data-testid="button-hero-services">
                   Explore Services
@@ -118,9 +120,9 @@ export default function HomePage() {
         <SectionHeading
           eyebrow="What we do"
           title="Bench work, done properly"
-          description="Three disciplines, one standard of care. Choose the service that brings you in — or ask us in person."
+          description="Two disciplines, one standard of care. Choose the service that brings you in — or ask us in person."
         />
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6">
           {services.map((service, idx) => {
             const Icon = serviceIcons[idx];
             return (
@@ -229,7 +231,7 @@ export default function HomePage() {
         <SectionHeading
           eyebrow="From the neighborhood"
           title="Trusted with pieces that matter"
-          description="A few words from customers who left their most valued watches and jewelry in our care."
+          description="A few words from customers who left their most valued watches in our care."
         />
         <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
           {featured.map((t) => (
@@ -262,15 +264,20 @@ export default function HomePage() {
               Bring in your watch today
             </h2>
             <p className="mt-4 text-muted-foreground leading-relaxed">
-              Walk in during shop hours, or book a time that works for you. We're at
-              233 East 84th Street, ready when you are.
+              Walk in during shop hours, or book a time that works for you. We're at{' '}
+              <AddressLink testId="link-cta-address" />, ready when you are.
             </p>
             <div className="mt-8 flex flex-wrap gap-3 justify-center">
-              <Link href="/repair/intake">
-                <Button size="lg" data-testid="button-cta-book">
-                  Start Repair Intake
+              <Button size="lg" asChild>
+                <Link href="/repair/intake" data-testid="button-cta-book">
+                  Start repair quote
+                </Link>
+              </Button>
+              {TEL_URL && (
+                <Button size="lg" variant="outline" asChild>
+                  <a href={TEL_URL} data-testid="button-cta-call">Call the shop</a>
                 </Button>
-              </Link>
+              )}
               <a
                 href={MAPS_URL}
                 target="_blank"

@@ -6,6 +6,7 @@ import { Separator } from '@workspace/upper-east-horology/components/ui/separato
 import { PageMeta } from '@/components/PageMeta';
 import { Section, SectionHeading } from '@/components/Section';
 import { WatchPoster } from '@/components/WatchPoster';
+import { AddressLink, PhoneLink } from '@/components/ContactLinks';
 import {
   ADDRESS_LOCALITY,
   ADDRESS_REGION,
@@ -56,17 +57,16 @@ export default function AboutPage() {
             <SectionHeading eyebrow="Why we exist" title="Fine work, done locally" />
             <div className="space-y-5 text-muted-foreground leading-relaxed text-base">
               <p>
-                For years, neighbors have brought their most valued watches and jewelry
-                to our bench at 233 East 84th Street — engagement rings, inherited
-                automatics, everyday quartz watches that simply need a fresh battery.
+                For years, neighbors have brought their most valued watches to our bench
+                at <AddressLink testId="link-story-address" /> — inherited automatics,
+                dress watches, everyday quartz watches that simply need a fresh battery.
                 Every one is treated with the same steady attention.
               </p>
               <p>
                 We service quartz and mechanical movements across all major brands,
-                from routine battery replacements to full high-end mechanical overhauls.
-                On the jewelry side, we resize rings, repair chains, replace diamonds,
-                and rebuild worn prongs — precise work that protects the pieces you wear
-                every day.
+                from routine battery replacements to full high-end mechanical overhauls,
+                along with crystals, crowns, gaskets, and bracelets — precise work that
+                protects the watch you wear every day.
               </p>
               <p>
                 What keeps customers coming back is simple: honest quotes before any work
@@ -95,8 +95,11 @@ export default function AboutPage() {
                   </span>
                 </div>
                 <address className="not-italic text-foreground leading-relaxed mb-4">
-                  {STREET_ADDRESS}<br />
-                  {ADDRESS_LOCALITY}, {ADDRESS_REGION} {POSTAL_CODE}
+                  <AddressLink testId="link-about-address">
+                    {STREET_ADDRESS}<br />
+                    {ADDRESS_LOCALITY}, {ADDRESS_REGION} {POSTAL_CODE}
+                  </AddressLink>
+                  <PhoneLink className="block mt-2 text-sm" testId="link-about-phone" />
                 </address>
                 <a href={MAPS_URL} target="_blank" rel="noopener noreferrer">
                   <Button variant="outline" className="w-full" data-testid="button-directions">

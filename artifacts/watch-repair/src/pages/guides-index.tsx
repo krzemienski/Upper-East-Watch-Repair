@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Link } from 'wouter';
 import { ChevronRight, ArrowRight, BookOpen, AlertCircle, Clock } from 'lucide-react';
 import {
@@ -22,7 +23,8 @@ import {
 } from '@workspace/upper-east-horology/components/ui/empty';
 import { PageMeta } from '@/components/PageMeta';
 import { Section } from '@/components/Section';
-import { SITE_URL, WORKBENCH_OG_IMAGE_URL } from '@/data/business';
+import { AddressLink } from '@/components/ContactLinks';
+import { SITE_URL, SHARE_IMAGE_URL } from '@/data/business';
 import { readingTime } from '@/lib/markdown';
 
 const BASE_PATH = import.meta.env.BASE_URL.endsWith('/')
@@ -44,15 +46,17 @@ function GuideCardSkeleton() {
 }
 
 export default function GuidesIndexPage() {
-  const { data: guides, isLoading, isError, refetch } = useListPublishedGuides();
+  const { data: allGuides, isLoading, isError, refetch } = useListPublishedGuides();
+  // Jewelry repair is no longer offered; historical guide records stay in the DB but are not listed.
+  const guides = useMemo(() => allGuides?.filter((g) => !g.slug.includes('jewelry')), [allGuides]);
 
   return (
     <>
       <PageMeta
         title="Watch Care Guides | Upper East Watch Repair"
-        description="Practical guides on watch care, battery life, water resistance, and jewelry maintenance from the bench at Upper East Watch Repair."
+        description="Practical guides on watch care, battery life, servicing, and water resistance from the bench at Upper East Watch Repair."
         canonical={`${SITE_URL}/guides`}
-        image={WORKBENCH_OG_IMAGE_URL}
+        image={SHARE_IMAGE_URL}
       />
 
       <Section className="pt-12 lg:pt-16 pb-8">
@@ -70,10 +74,10 @@ export default function GuidesIndexPage() {
               From the bench
             </p>
             <h1 className="font-serif text-4xl sm:text-5xl font-semibold text-foreground leading-[1.05]">
-              Watch &amp; jewelry care guides
+              Watch care guides
             </h1>
             <p className="mt-5 text-lg text-muted-foreground leading-relaxed">
-              Practical, honest advice on keeping your timepieces and jewelry in the best
+              Practical, honest advice on keeping your timepieces in the best
               possible condition — straight from the people at the bench.
             </p>
           </div>
@@ -88,7 +92,7 @@ export default function GuidesIndexPage() {
               loading="eager"
             />
             <figcaption className="px-4 py-3 text-xs leading-relaxed text-muted-foreground">
-              Inside the repair bench at 233 East 84th Street.
+              Inside the repair bench at <AddressLink testId="link-guides-address" />.
             </figcaption>
           </figure>
         </div>
