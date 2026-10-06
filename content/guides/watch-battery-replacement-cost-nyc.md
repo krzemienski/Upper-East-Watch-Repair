@@ -106,7 +106,7 @@ A stopped quartz watch often needs a battery, but not always. Warning signs that
 
 If a battery has leaked, replacing it may not reverse corrosion already present. Likewise, a movement blocked by debris can draw excessive current and exhaust a fresh cell. A technician may recommend cleaning, movement repair, or movement replacement after inspection. For perspective on maintenance differences between movement types, see [how often a watch should be serviced](/guides/how-often-should-a-watch-be-serviced).
 
-Watch straps and bracelets can also complicate what seems like a battery visit. A damaged clasp, bent component, or precious-metal bracelet issue is separate from battery work and should be quoted on its own. Our [jewelry repair service](/services/jewelry-repair) covers related repair inquiries where appropriate.
+Watch straps and bracelets can also complicate what seems like a battery visit. A damaged clasp, bent component, or precious-metal bracelet issue is separate from battery work and should be quoted on its own. Ask about watch-specific bracelet or clasp work during a [watch repair assessment](/services/watch-repair). Precious-metal soldering and jewelry repair should be referred to a qualified jeweler; we no longer offer jewelry repair.
 
 ## How to Get a Useful NYC Estimate
 

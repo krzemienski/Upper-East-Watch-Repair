@@ -1,2 +1,3 @@
 - [Generated Markdown ingestion](generated-markdown-ingestion.md) — normalize CRLF and use shell-backed reads if durable file callbacks lag behind newly generated files.
 - [GA4 ownership and verification](ga4-verification.md) — automatic pageviews depend on stream settings; a build is not proof of live GA ingestion.
+- [Guide editorial source](guide-editorial-source.md) — published editorial records outrank bundled seeds; static HTML updates require rebuilding.

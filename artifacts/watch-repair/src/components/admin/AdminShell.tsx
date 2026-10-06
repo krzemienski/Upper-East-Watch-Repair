@@ -8,9 +8,9 @@ import { Logo } from '@/components/Logo';
 import { useAdminSession } from './AdminGate';
 
 const NAV = [
-  { href: '/admin', label: 'Repair requests', icon: ClipboardList, match: (path: string) => path === '/admin' || path.startsWith('/admin/leads') },
-  { href: '/admin/customers', label: 'Customers', icon: Users, match: (path: string) => path.startsWith('/admin/customers') },
-  { href: '/admin/guides', label: 'Guides', icon: FileText, match: (path: string) => path.startsWith('/admin/guides') },
+  { href: '/', label: 'Repair requests', icon: ClipboardList, match: (path: string) => path === '/' || path.startsWith('/leads') },
+  { href: '/customers', label: 'Customers', icon: Users, match: (path: string) => path.startsWith('/customers') },
+  { href: '/guides', label: 'Guides', icon: FileText, match: (path: string) => path.startsWith('/guides') },
 ];
 
 export function AdminShell({
@@ -34,7 +34,7 @@ export function AdminShell({
       <PageMeta title={`${title} | Shop admin`} description="Protected Upper East Watch Repair shop workspace." />
       <header className="border-b border-border bg-card">
         <div className="max-w-[1500px] mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
-          <Link href="/admin" className="flex items-center gap-3 min-w-0" aria-label="Shop admin home">
+          <Link href="/" className="flex items-center gap-3 min-w-0" aria-label="Shop admin home">
             <Logo className="h-7 w-auto shrink-0" />
             <span className="hidden sm:inline text-xs uppercase tracking-[.2em] text-primary font-semibold">Shop admin</span>
           </Link>

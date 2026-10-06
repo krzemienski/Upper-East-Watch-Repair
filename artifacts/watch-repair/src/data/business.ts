@@ -1,5 +1,7 @@
+import site from '../../../../content/site.json';
+
 export const BUSINESS_NAME = 'Upper East Watch Repair';
-export const SITE_URL = 'https://uppereastwatchrepair.com';
+export const SITE_URL = site.siteUrl;
 export const WORKBENCH_OG_IMAGE_URL =
   `${SITE_URL}/media/upper-east-watch-repair-workbench-og.webp`;
 /** Branded 1200x630 share card used for Open Graph and Twitter cards. */

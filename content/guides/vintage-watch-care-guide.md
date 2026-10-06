@@ -59,7 +59,7 @@ Keep a vintage mechanical watch away from obvious strong magnets. If its rate ch
 
 A deteriorated strap can fail without warning. Examine leather near the spring bars and buckle for cracking or torn stitching. Check a metal bracelet for loose pins, damaged links, and wear at the end links.
 
-The strap should fit the lug width without being forced. Spring bars must be the correct diameter and length, with tips that seat securely in the lug holes. If a valuable watch came with an original strap or buckle, consider storing that component and using a sound replacement for regular wear. For problems involving a bracelet, buckle, or attached jewelry component, ask whether [jewelry repair](/services/jewelry-repair) or watch-specific bench work is the appropriate route before authorizing work.
+The strap should fit the lug width without being forced. Spring bars must be the correct diameter and length, with tips that seat securely in the lug holes. If a valuable watch came with an original strap or buckle, consider storing that component and using a sound replacement for regular wear. For bracelet or buckle problems, ask about a [watch repair assessment](/services/watch-repair) before authorizing work. Attached jewelry or precious-metal soldering requires a qualified jeweler; we no longer offer jewelry repair.
 
 ## Clean only what is safe to clean
 

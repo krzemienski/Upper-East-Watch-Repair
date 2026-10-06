@@ -1,0 +1,26 @@
+[
+  {
+    "old": "For problems involving a bracelet, buckle, or attached jewelry component, ask whether [jewelry repair](/services/jewelry-repair) or watch-specific bench work is the appropriate route before authorizing work.",
+    "new": "For bracelet or buckle problems, ask about a [watch repair assessment](/services/watch-repair) before authorizing work. Attached jewelry or precious-metal soldering requires a qualified jeweler; we no longer offer jewelry repair."
+  },
+  {
+    "old": "Our [jewelry repair service](/services/jewelry-repair) covers related repair inquiries where appropriate.",
+    "new": "Ask about watch-specific bracelet or clasp work during a [watch repair assessment](/services/watch-repair). Precious-metal soldering and jewelry repair should be referred to a qualified jeweler; we no longer offer jewelry repair."
+  },
+  {
+    "old": "If a bracelet, clasp, or decorative metal component needs structural attention, the work may fall under [jewelry repair](/services/jewelry-repair) rather than a home watch-tool project.",
+    "new": "Ask about bracelet or clasp problems during a [watch repair assessment](/services/watch-repair). Precious-metal soldering or decorative jewelry work should be referred to a qualified jeweler; it is not a home watch-tool project."
+  },
+  {
+    "old": "If a bracelet or clasp needs precious-metal work, the [jewelry repair service](/services/jewelry-repair) may be the better starting point.",
+    "new": "Precious-metal soldering or jewelry work requires a qualified jeweler; we no longer offer jewelry repair."
+  },
+  {
+    "old": "Jewelry attached to a watch, such as certain bracelets or clasps, may call for related [jewelry repair](/services/jewelry-repair) assessment rather than movement work alone.",
+    "new": "Ask about bracelet and clasp concerns during a [watch repair assessment](/services/watch-repair). Decorative jewelry or precious-metal soldering may require a separate qualified jeweler; we no longer offer jewelry repair."
+  },
+  {
+    "old": "A failing metal bracelet or clasp is a separate issue and may call for [jewelry repair](/services/jewelry-repair), not battery work.",
+    "new": "A failing bracelet or clasp is a separate issue: ask about a [watch repair assessment](/services/watch-repair), not battery work. Refer precious-metal soldering or decorative jewelry work to a qualified jeweler."
+  }
+]

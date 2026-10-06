@@ -107,7 +107,7 @@ Even a carefully selected kit does not reproduce a working watchmaker’s bench,
 
 A case-back gasket is not proof of water resistance. A watch that starts after a battery change is not automatically healthy. A mechanical watch that appears to run after oil is added from the outside has not been serviced and may be harmed by misplaced lubricant.
 
-For budgeting professional work, read our [2026 NYC watch repair cost guide](/guides/watch-repair-cost-nyc). If a bracelet, clasp, or decorative metal component needs structural attention, the work may fall under [jewelry repair](/services/jewelry-repair) rather than a home watch-tool project.
+For budgeting professional work, read our [2026 NYC watch repair cost guide](/guides/watch-repair-cost-nyc). Ask about bracelet or clasp problems during a [watch repair assessment](/services/watch-repair). Precious-metal soldering or decorative jewelry work should be referred to a qualified jeweler; it is not a home watch-tool project.
 
 ## Know when to bring the watch in
 

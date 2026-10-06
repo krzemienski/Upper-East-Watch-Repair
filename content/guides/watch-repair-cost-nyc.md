@@ -104,7 +104,7 @@ A short conversation can prevent misunderstandings:
 - Is there a diagnostic fee if I decline the work?
 - What timing range is realistic if parts must be ordered?
 
-For watches with sentimental or substantial value, mention any surfaces you do not want polished and any original components you want preserved where feasible. Jewelry attached to a watch, such as certain bracelets or clasps, may call for related [jewelry repair](/services/jewelry-repair) assessment rather than movement work alone.
+For watches with sentimental or substantial value, mention any surfaces you do not want polished and any original components you want preserved where feasible. Ask about bracelet and clasp concerns during a [watch repair assessment](/services/watch-repair). Decorative jewelry or precious-metal soldering may require a separate qualified jeweler; we no longer offer jewelry repair.
 
 ## Get an estimate on the Upper East Side
 

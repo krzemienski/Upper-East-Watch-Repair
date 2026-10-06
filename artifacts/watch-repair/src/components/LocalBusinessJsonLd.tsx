@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import {
   ADDRESS_LOCALITY,
   ADDRESS_REGION,
@@ -14,10 +13,6 @@ import {
 } from '@/data/business';
 
 export function LocalBusinessJsonLd() {
-  useEffect(() => {
-    const existing = document.getElementById('local-business-jsonld');
-    if (existing) return;
-
     const schema = {
       '@context': 'https://schema.org',
       '@type': 'LocalBusiness',
@@ -48,17 +43,6 @@ export function LocalBusinessJsonLd() {
       paymentAccepted: 'Cash, Credit Card',
     };
 
-    const script = document.createElement('script');
-    script.id = 'local-business-jsonld';
-    script.type = 'application/ld+json';
-    script.textContent = JSON.stringify(schema);
-    document.head.appendChild(script);
-
-    return () => {
-      const el = document.getElementById('local-business-jsonld');
-      if (el) el.remove();
-    };
-  }, []);
-
-  return null;
+  return <script id="local-business-jsonld" type="application/ld+json"
+    dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, '\\u003c') }} />;
 }

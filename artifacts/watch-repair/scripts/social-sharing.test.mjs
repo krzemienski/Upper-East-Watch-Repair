@@ -4,10 +4,10 @@ import path from "node:path";
 import { test } from "node:test";
 import vm from "node:vm";
 import ts from "typescript";
+import site from '../../../content/site.json' with { type: 'json' };
 
 const root = path.resolve(import.meta.dirname, "..");
-const business = await readFile(path.join(root, "src/data/business.ts"), "utf8");
-const siteUrl = business.match(/export const SITE_URL = '([^']+)'/)[1];
+const siteUrl = site.siteUrl;
 const workbench = `${siteUrl}/media/upper-east-watch-repair-workbench-og.webp`;
 const guideImage = `${siteUrl}/og/upper-east-watch-repair-share.png`;
 
@@ -41,7 +41,10 @@ test("built marketing documents have workbench previews; guides retain their pre
   checkPreview(await readFile(path.join(guidesDir, "index.html"), "utf8"), guideImage);
   for (const entry of await readdir(guidesDir, { withFileTypes: true })) {
     if (entry.isDirectory()) {
-      checkPreview(await readFile(path.join(guidesDir, entry.name, "index.html"), "utf8"), guideImage);
+      const html = await readFile(path.join(guidesDir, entry.name, "index.html"), "utf8");
+      const snapshot = html.match(/<script id="published-guide-snapshot" type="application\/json">([^<]+)<\/script>/);
+      const guide = snapshot ? JSON.parse(snapshot[1])[0] : null;
+      checkPreview(html, new URL(guide?.ogImage || guideImage, siteUrl).href);
     }
   }
 });
@@ -67,7 +70,11 @@ test("PageMeta defaults, overrides, and restores social metadata on navigation",
     exports, document, URL,
     window: { location: { pathname: "/about" } },
     require(name) {
-      if (name === "react") return { useEffect: (effect) => effect() };
+      if (name === "react") return {
+        useEffect: (effect) => effect(),
+        createContext: () => ({}),
+        useContext: () => null,
+      };
       if (name === "@/data/business") return { SITE_URL: siteUrl, WORKBENCH_OG_IMAGE_URL: workbench };
       throw new Error(`Unexpected import: ${name}`);
     },

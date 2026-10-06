@@ -83,7 +83,7 @@ export function HeroMedia({ className, paused = false }: HeroMediaProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const motionLayerRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef(new Map<number, HTMLVideoElement>());
-  const visibleRef = useRef(!document.hidden);
+  const visibleRef = useRef(typeof document === 'undefined' || !document.hidden);
   const transitionTimerRef = useRef<number | undefined>(undefined);
   const orderRef = useRef(initialOrder);
   const cursorRef = useRef(2);

@@ -102,12 +102,12 @@ function RoutedErrorBoundary({ children }: { children: ReactNode }) {
   return <ErrorBoundary resetKey={location}>{children}</ErrorBoundary>;
 }
 
-function App() {
+function App({ ssrPath, client = queryClient }: { ssrPath?: string; client?: QueryClient } = {}) {
   return (
-    <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={client}>
       <TooltipProvider>
         <LocalBusinessJsonLd />
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
+        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')} ssrPath={ssrPath}>
           <SiteAnalytics />
           <Router />
         </WouterRouter>

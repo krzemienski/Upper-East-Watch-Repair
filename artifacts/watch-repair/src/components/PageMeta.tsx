@@ -1,14 +1,21 @@
-import { useEffect } from 'react';
 import { WORKBENCH_OG_IMAGE_URL, SITE_URL } from '@/data/business';
+import { createContext, useContext, useEffect } from 'react';
 
-interface PageMetaProps {
+export interface PageMetaProps {
   title: string;
   description: string;
   canonical?: string;
   image?: string;
 }
 
+/** Build-time collector: render the real page once and retain its exact metadata. */
+export const PageMetaCollector = createContext<((meta: PageMetaProps) => void) | null>(null);
 export function PageMeta({ title, description, canonical: canonicalProp, image: imageProp }: PageMetaProps) {
+  const collect = useContext(PageMetaCollector);
+  collect?.({
+    title, description, canonical: canonicalProp,
+    image: new URL(imageProp || WORKBENCH_OG_IMAGE_URL, SITE_URL).href,
+  });
   useEffect(() => {
     const canonical = canonicalProp ?? `${SITE_URL}${window.location.pathname.replace(/\/$/, '') || '/'}`;
     const image = new URL(imageProp || WORKBENCH_OG_IMAGE_URL, SITE_URL).href;

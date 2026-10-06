@@ -148,6 +148,6 @@ If a battery is swollen, hot, damaged, or leaking, avoid contact and seek curren
 
 A battery change can reveal a deteriorated gasket, damaged contact, moisture, or movement fault. Choose professional handling when the watch is important, unfamiliar, water-resistant, or does not start after replacement.
 
-Vintage watches deserve a preservation-first approach; see our [vintage watch care guide](/guides/vintage-watch-care-guide) before opening an older case. A failing metal bracelet or clasp is a separate issue and may call for [jewelry repair](/services/jewelry-repair), not battery work.
+Vintage watches deserve a preservation-first approach; see our [vintage watch care guide](/guides/vintage-watch-care-guide) before opening an older case. A failing bracelet or clasp is a separate issue: ask about a [watch repair assessment](/services/watch-repair), not battery work. Refer precious-metal soldering or decorative jewelry work to a qualified jeweler.
 
 For a straightforward assessment, bring the watch and any loose parts to Upper East Watch Repair at 233 East 84th Street, New York, NY 10028, or [schedule a visit](/book). Stop before force turns a simple battery change into a case or movement repair.

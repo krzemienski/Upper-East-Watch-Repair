@@ -20,8 +20,56 @@ serve = "static"
 publicDir = "artifacts/watch-repair/dist/public"
 
 [[services.production.rewrites]]
+from = "/services/watch-repair"
+to = "/services/watch-repair.html"
+
+[[services.production.rewrites]]
+from = "/services/battery-replacement"
+to = "/services/battery-replacement.html"
+
+[[services.production.rewrites]]
+from = "/services/jewelry-repair"
+to = "/services/jewelry-repair.html"
+
+[[services.production.rewrites]]
+from = "/about"
+to = "/about.html"
+
+[[services.production.rewrites]]
+from = "/book"
+to = "/book.html"
+
+[[services.production.rewrites]]
+from = "/repair"
+to = "/repair.html"
+
+[[services.production.rewrites]]
+from = "/repair/intake"
+to = "/repair/intake.html"
+
+[[services.production.rewrites]]
+from = "/guides"
+to = "/guides.html"
+
+[[services.production.rewrites]]
+from = "/admin"
+to = "/admin.html"
+
+[[services.production.rewrites]]
+from = "/admin/leads"
+to = "/admin/leads.html"
+
+[[services.production.rewrites]]
+from = "/repair/intake/in-store"
+to = "/repair/intake/in-store.html"
+
+[[services.production.rewrites]]
+from = "/guides/*"
+to = "/guides/*.html"
+
+[[services.production.rewrites]]
 from = "/*"
-to = "/index.html"
+to = "/app.html"
 
 [services.env]
 PORT = "26203"

@@ -11,9 +11,13 @@ import {
   UpdateGuideResponse,
 } from "@workspace/api-zod";
 import { db, guidesTable } from "@workspace/db";
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, notInArray, sql } from "drizzle-orm";
 import { Router, type IRouter, type Request, type Response } from "express";
 import { isAdminRequest } from "../lib/adminAuth";
+import site from "../../../../content/site.json";
+
+const retiredSlugs = site.retiredPaths.filter((path) => path.startsWith("/guides/"))
+  .map((path) => path.slice("/guides/".length));
 
 const router: IRouter = Router();
 
@@ -34,7 +38,7 @@ router.get("/guides", async (req, res): Promise<void> => {
   const guides = await db
     .select()
     .from(guidesTable)
-    .where(eq(guidesTable.status, "published"))
+    .where(and(eq(guidesTable.status, "published"), notInArray(guidesTable.slug, retiredSlugs)))
     .orderBy(desc(guidesTable.publishedAt), desc(guidesTable.createdAt));
 
   req.log.debug({ count: guides.length }, "Listed published guides");
@@ -42,6 +46,10 @@ router.get("/guides", async (req, res): Promise<void> => {
 });
 
 router.get("/guides/:slug", async (req, res): Promise<void> => {
+  if (retiredSlugs.includes(String(req.params.slug))) {
+    res.status(404).json({ error: "Guide retired" });
+    return;
+  }
   const params = GetPublishedGuideParams.safeParse(req.params);
   if (!params.success) {
     req.log.warn({ errors: params.error.issues }, "Invalid guide slug");

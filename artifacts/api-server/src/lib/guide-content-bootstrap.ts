@@ -1,16 +1,17 @@
 import { pool } from "@workspace/db";
+import site from "../../../../content/site.json";
+import retiredRecommendations from "../../../../content/guide-migrations.json";
 
 import toolsGuide from "../../../../content/guides/best-watch-repair-tools-amazon.md";
 import serviceGuide from "../../../../content/guides/how-often-should-a-watch-be-serviced.md";
 import batteryDiyGuide from "../../../../content/guides/how-to-replace-watch-battery-at-home.md";
-import jewelryCostGuide from "../../../../content/guides/jewelry-repair-cost-nyc.md";
 import vintageCareGuide from "../../../../content/guides/vintage-watch-care-guide.md";
 import batteryCostGuide from "../../../../content/guides/watch-battery-replacement-cost-nyc.md";
 import watchCostGuide from "../../../../content/guides/watch-repair-cost-nyc.md";
 import waterResistanceGuide from "../../../../content/guides/watch-water-resistance-pressure-testing.md";
 
 const WORKBENCH_OG_IMAGE =
-  "https://upper-east-watch-repair.replit.app/media/upper-east-watch-repair-workbench-og.webp";
+  `${site.siteUrl}/media/upper-east-watch-repair-workbench-og.webp`;
 const ROLEX_GUIDE_SLUG = "how-much-is-my-rolex-worth";
 const ROLEX_LEGACY_META_DESCRIPTION =
   "Learn how Rolex watches are valued: reference numbers, condition, provenance, and market demand—plus when to get a professional appraisal in NYC.";
@@ -21,7 +22,6 @@ const GUIDE_AUTHOR = "Upper East Watch Repair";
 const newGuideSources = [
   toolsGuide,
   batteryDiyGuide,
-  jewelryCostGuide,
   watchCostGuide,
   waterResistanceGuide,
 ];
@@ -114,6 +114,27 @@ export async function bootstrapGuideContent() {
 
   try {
     await client.query("BEGIN");
+
+    // Retain the historical record for editors, but never publish a retired service.
+    await client.query(
+      "UPDATE guides SET status = 'draft', updated_at = now() WHERE slug = $1 AND status = 'published'",
+      ["jewelry-repair-cost-nyc"],
+    );
+    await client.query(
+      "UPDATE guides SET og_image = $1 WHERE og_image = $2",
+      [WORKBENCH_OG_IMAGE, "https://upper-east-watch-repair.replit.app/media/upper-east-watch-repair-workbench-og.webp"],
+    );
+
+    // Replace known bundled recommendations, not just their URLs (which would
+    // leave a link promising jewelry repair that actually lands on watch repair).
+    // Exact-match substitutions preserve unrelated editor changes.
+    for (const { old: oldText, new: newText } of retiredRecommendations) {
+      await client.query(
+        `UPDATE guides SET body = replace(body, $1, $2), updated_at = now()
+         WHERE strpos(body, $1) > 0`,
+        [oldText, newText],
+      );
+    }
 
     for (const guide of newGuides) {
       const result = await client.query(

@@ -111,7 +111,7 @@ Ask practical questions:
 - Is water-resistance testing appropriate for this case?
 - How will additional work discovered after disassembly be authorized?
 
-Clear intake notes distinguish drop-off condition from requested work. For movement, crown, crystal, and case concerns, see our [watch repair service](/services/watch-repair). If a bracelet or clasp needs precious-metal work, the [jewelry repair service](/services/jewelry-repair) may be the better starting point.
+Clear intake notes distinguish drop-off condition from requested work. For movement, crown, crystal, case, bracelet, and clasp concerns, ask about our [watch repair service](/services/watch-repair). Precious-metal soldering or jewelry work requires a qualified jeweler; we no longer offer jewelry repair.
 
 ## A Practical Service Plan
 

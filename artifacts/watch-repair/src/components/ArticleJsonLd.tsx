@@ -1,8 +1,7 @@
-import { useEffect } from 'react';
 import type { Guide } from '@workspace/api-client-react';
+import { SITE_URL, SHARE_IMAGE_URL } from '@/data/business';
 
 export function ArticleJsonLd({ guide }: { guide: Guide }) {
-  useEffect(() => {
     const schema = {
       '@context': 'https://schema.org',
       '@type': 'Article',
@@ -18,27 +17,13 @@ export function ArticleJsonLd({ guide }: { guide: Guide }) {
       },
       datePublished: guide.publishedAt ?? guide.createdAt,
       dateModified: guide.updatedAt,
-      ...(guide.ogImage ? { image: guide.ogImage } : {}),
+      image: guide.ogImage || SHARE_IMAGE_URL,
       mainEntityOfPage: {
         '@type': 'WebPage',
-        '@id': window.location.href,
+        '@id': `${SITE_URL}/guides/${guide.slug}`,
       },
     };
 
-    const script = document.createElement('script');
-    script.type = 'application/ld+json';
-    script.id = 'article-jsonld';
-    script.textContent = JSON.stringify(schema);
-    // Remove any prior article schema before adding
-    const prev = document.getElementById('article-jsonld');
-    if (prev) prev.remove();
-    document.head.appendChild(script);
-
-    return () => {
-      const el = document.getElementById('article-jsonld');
-      if (el) el.remove();
-    };
-  }, [guide]);
-
-  return null;
+  return <script id="article-jsonld" type="application/ld+json"
+    dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, '\\u003c') }} />;
 }
