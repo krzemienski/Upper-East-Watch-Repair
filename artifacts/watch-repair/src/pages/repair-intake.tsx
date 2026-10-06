@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } 
 import { Link, useLocation } from 'wouter';
 import { ArrowLeft, CheckCircle2, Loader2, LockKeyhole, Store } from 'lucide-react';
 import { Button } from '@workspace/upper-east-horology/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@workspace/upper-east-horology/components/ui/card';
+import { Card, CardContent, CardHeader } from '@workspace/upper-east-horology/components/ui/card';
 import { Input } from '@workspace/upper-east-horology/components/ui/input';
 import { Textarea } from '@workspace/upper-east-horology/components/ui/textarea';
 import { Label } from '@workspace/upper-east-horology/components/ui/label';
@@ -206,24 +206,24 @@ export default function RepairIntakePage({ inStore = false }: { inStore?: boolea
         </div>
         <form onSubmit={submit} onChangeCapture={startForm} onInvalidCapture={() => measureForm('repair_form_validation_error', { error_type: 'invalid_field' })} className="space-y-6">
           <FormCard title="Your contact details">
-            <Field label="Name *"><Input value={values.name} onChange={(e) => set('name', e.target.value)} autoComplete="name" required /></Field>
+            <Field label="Name *" htmlFor="repair-name"><Input id="repair-name" value={values.name} onChange={(e) => set('name', e.target.value)} autoComplete="name" required /></Field>
             <div className="grid sm:grid-cols-2 gap-5">
-              <Field label="Phone"><Input value={values.phone} onChange={(e) => set('phone', e.target.value)} type="tel" autoComplete="tel" /></Field>
-              <Field label="Email"><Input value={values.email} onChange={(e) => set('email', e.target.value)} type="email" autoComplete="email" /></Field>
+              <Field label="Phone" htmlFor="repair-phone"><Input id="repair-phone" value={values.phone} onChange={(e) => set('phone', e.target.value)} type="tel" autoComplete="tel" /></Field>
+              <Field label="Email" htmlFor="repair-email"><Input id="repair-email" value={values.email} onChange={(e) => set('email', e.target.value)} type="email" autoComplete="email" /></Field>
             </div>
             <p className="text-xs text-muted-foreground -mt-2">At least one of phone or email is required.</p>
-            <Field label="Preferred contact *">
+            <Field label="Preferred contact *" htmlFor="repair-preferred-contact">
               <Select value={values.preferredContact} onValueChange={(v) => set('preferredContact', v)}>
-                <SelectTrigger><SelectValue placeholder="Choose phone, text, or email" /></SelectTrigger>
+                <SelectTrigger id="repair-preferred-contact" aria-labelledby="repair-preferred-contact-label" aria-required="true"><SelectValue placeholder="Choose phone, text, or email" /></SelectTrigger>
                 <SelectContent><SelectItem value="phone">Phone call</SelectItem><SelectItem value="sms">Text message</SelectItem><SelectItem value="email">Email</SelectItem></SelectContent>
               </Select>
             </Field>
           </FormCard>
 
           <FormCard title="Watch and service">
-            <Field label="Service category *">
+            <Field label="Service category *" htmlFor="repair-service-category">
               <Select value={values.serviceCategory} onValueChange={(v) => set('serviceCategory', v)}>
-                <SelectTrigger><SelectValue placeholder="What does your watch need?" /></SelectTrigger>
+                <SelectTrigger id="repair-service-category" aria-labelledby="repair-service-category-label" aria-required="true"><SelectValue placeholder="What does your watch need?" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="diagnosis">Not sure / diagnosis</SelectItem>
                   <SelectItem value="battery">Battery replacement</SelectItem>
@@ -235,11 +235,11 @@ export default function RepairIntakePage({ inStore = false }: { inStore?: boolea
                 </SelectContent>
               </Select>
             </Field>
-            <Field label="Brand"><Input value={values.brand} onChange={(e) => set('brand', e.target.value)} placeholder="Rolex, Omega, Seiko…" data-testid="input-brand" /></Field>
-            <Field label="Symptoms *"><Textarea rows={4} value={values.symptoms} onChange={(e) => set('symptoms', e.target.value)} placeholder="What is happening, and when did it begin?" required /></Field>
-            <Field label="Urgency">
+            <Field label="Brand" htmlFor="repair-brand"><Input id="repair-brand" value={values.brand} onChange={(e) => set('brand', e.target.value)} placeholder="Rolex, Omega, Seiko…" data-testid="input-brand" /></Field>
+            <Field label="Symptoms *" htmlFor="repair-symptoms"><Textarea id="repair-symptoms" rows={4} value={values.symptoms} onChange={(e) => set('symptoms', e.target.value)} placeholder="What is happening, and when did it begin?" required /></Field>
+            <Field label="Urgency" htmlFor="repair-urgency">
               <Select value={values.urgency} onValueChange={(v) => set('urgency', v)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger id="repair-urgency" aria-labelledby="repair-urgency-label"><SelectValue /></SelectTrigger>
                 <SelectContent><SelectItem value="flexible">Flexible</SelectItem><SelectItem value="two_weeks">Within two weeks</SelectItem><SelectItem value="one_week">Within one week</SelectItem><SelectItem value="urgent">Urgent / event date</SelectItem></SelectContent>
               </Select>
             </Field>
@@ -268,9 +268,9 @@ export default function RepairIntakePage({ inStore = false }: { inStore?: boolea
 }
 
 function FormCard({ title, children }: { title: string; children: ReactNode }) {
-  return <Card><CardHeader><CardTitle className="font-serif text-2xl">{title}</CardTitle></CardHeader><CardContent className="space-y-5">{children}</CardContent></Card>;
+  return <Card><CardHeader><h2 className="font-serif text-2xl font-semibold leading-none tracking-tight">{title}</h2></CardHeader><CardContent className="space-y-5">{children}</CardContent></Card>;
 }
 
-function Field({ label, children }: { label: string; children: ReactNode }) {
-  return <div className="space-y-2"><Label>{label}</Label>{children}</div>;
+function Field({ label, htmlFor, children }: { label: string; htmlFor: string; children: ReactNode }) {
+  return <div className="space-y-2"><Label id={`${htmlFor}-label`} htmlFor={htmlFor}>{label}</Label>{children}</div>;
 }

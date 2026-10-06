@@ -60,6 +60,7 @@ function shuffledIndexes(): number[] {
 
 interface HeroMediaProps {
   className?: string;
+  paused?: boolean;
 }
 
 /**
@@ -68,8 +69,11 @@ interface HeroMediaProps {
  * active one. Public page content scrolls over this layer without exposing its
  * bounds.
  */
-export function HeroMedia({ className }: HeroMediaProps) {
+export function HeroMedia({ className, paused = false }: HeroMediaProps) {
   const reducedMotion = usePrefersReducedMotion();
+  const motionStopped = paused || reducedMotion;
+  const motionStoppedRef = useRef(motionStopped);
+  motionStoppedRef.current = motionStopped;
   const isMobile = useIsMobile();
   const initialOrder = useMemo(shuffledIndexes, []);
   const [activeIndex, setActiveIndex] = useState(initialOrder[0]);
@@ -108,6 +112,7 @@ export function HeroMedia({ className }: HeroMediaProps) {
   }, []);
 
   const finishTransition = useCallback(() => {
+    if (motionStoppedRef.current) return;
     setTransitioning(false);
     setActiveIndex(nextIndex);
     const replacement = getNextIndex(nextIndex, failed);
@@ -115,11 +120,15 @@ export function HeroMedia({ className }: HeroMediaProps) {
   }, [failed, getNextIndex, nextIndex]);
 
   const beginTransition = useCallback(() => {
-    if (transitioning || !visibleRef.current) return;
+    if (motionStoppedRef.current || transitioning || !visibleRef.current) return;
     const upcoming = videoRefs.current.get(nextIndex);
     if (!upcoming || upcoming.readyState < HTMLMediaElement.HAVE_FUTURE_DATA) return;
 
     void upcoming.play().then(() => {
+      if (motionStoppedRef.current || !visibleRef.current) {
+        upcoming.pause();
+        return;
+      }
       setTransitioning(true);
       window.clearTimeout(transitionTimerRef.current);
       transitionTimerRef.current = window.setTimeout(finishTransition, CROSSFADE_MS);
@@ -129,7 +138,7 @@ export function HeroMedia({ className }: HeroMediaProps) {
   }, [finishTransition, nextIndex, transitioning]);
 
   const handleTimeUpdate = (index: number) => {
-    if (index !== activeIndex || transitioning) return;
+    if (motionStoppedRef.current || index !== activeIndex || transitioning) return;
     const video = videoRefs.current.get(index);
     if (video && video.duration - video.currentTime <= CROSSFADE_SECONDS + 0.15) {
       beginTransition();
@@ -137,7 +146,7 @@ export function HeroMedia({ className }: HeroMediaProps) {
   };
 
   const handleEnded = (index: number) => {
-    if (index !== activeIndex || transitioning) return;
+    if (motionStoppedRef.current || index !== activeIndex || transitioning) return;
     const video = videoRefs.current.get(index);
     if (!video) return;
     video.currentTime = 0;
@@ -165,7 +174,12 @@ export function HeroMedia({ className }: HeroMediaProps) {
   };
 
   useEffect(() => {
-    if (reducedMotion || failed.size === HERO_VARIATIONS.length) return;
+    if (motionStopped || failed.size === HERO_VARIATIONS.length) {
+      window.clearTimeout(transitionTimerRef.current);
+      setTransitioning(false);
+      videoRefs.current.forEach((video) => video.pause());
+      return;
+    }
     const motionLayer = motionLayerRef.current;
     if (!motionLayer) return;
 
@@ -184,9 +198,9 @@ export function HeroMedia({ className }: HeroMediaProps) {
     };
     const syncPlayback = () => {
       videoRefs.current.forEach((video, index) => {
-        if (visibleRef.current && index === activeIndex) {
+        if (visibleRef.current && (index === activeIndex || (transitioning && index === nextIndex))) {
           void video.play().catch(() => undefined);
-        } else if (!(transitioning && index === nextIndex)) {
+        } else {
           video.pause();
         }
       });
@@ -205,10 +219,17 @@ export function HeroMedia({ className }: HeroMediaProps) {
       if (!isMobile) window.removeEventListener('scroll', requestParallaxUpdate);
       document.removeEventListener('visibilitychange', handleVisibility);
       if (frame) window.cancelAnimationFrame(frame);
+      videoRefs.current.forEach((video) => video.pause());
     };
-  }, [activeIndex, failed.size, isMobile, nextIndex, reducedMotion, transitioning]);
+  }, [activeIndex, failed.size, isMobile, nextIndex, motionStopped, transitioning]);
 
-  useEffect(() => () => window.clearTimeout(transitionTimerRef.current), []);
+  useEffect(() => {
+    motionStoppedRef.current = motionStopped;
+    return () => {
+      motionStoppedRef.current = true;
+      window.clearTimeout(transitionTimerRef.current);
+    };
+  }, [motionStopped]);
 
   const noPlayableMedia = failed.size === HERO_VARIATIONS.length;
   const activeVariation = HERO_VARIATIONS[activeIndex];
@@ -221,9 +242,9 @@ export function HeroMedia({ className }: HeroMediaProps) {
     >
       <WatchPoster className="absolute inset-0 h-full w-full" />
 
-      {reducedMotion && !failed.has(0) ? (
+      {motionStopped ? (
         <img
-          src={HERO_VARIATIONS[0].poster}
+          src={reducedMotion ? HERO_VARIATIONS[0].poster : activeVariation.poster}
           alt=""
           className="absolute inset-0 h-full w-full object-cover"
           loading="eager"
@@ -242,7 +263,12 @@ export function HeroMedia({ className }: HeroMediaProps) {
                 key={variation.id}
                 ref={(node) => {
                   if (node) videoRefs.current.set(index, node);
-                  else videoRefs.current.delete(index);
+                  else {
+                    // Removing media for the static fallback must also stop
+                    // detached elements, including an incoming crossfade clip.
+                    videoRefs.current.get(index)?.pause();
+                    videoRefs.current.delete(index);
+                  }
                 }}
                 className={cn(
                   'absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ease-in-out',

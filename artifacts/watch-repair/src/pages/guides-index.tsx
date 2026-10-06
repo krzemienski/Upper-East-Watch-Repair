@@ -9,7 +9,6 @@ import {
   Card,
   CardContent,
   CardHeader,
-  CardTitle,
   CardDescription,
 } from '@workspace/upper-east-horology/components/ui/card';
 import { Skeleton } from '@workspace/upper-east-horology/components/ui/skeleton';
@@ -163,9 +162,9 @@ export default function GuidesIndexPage() {
                       <span aria-hidden>·</span>
                       <span>{guide.author}</span>
                     </div>
-                    <CardTitle className="font-serif text-xl leading-snug">
+                    <h2 className="font-serif text-xl font-semibold tracking-tight leading-snug">
                       {guide.title}
-                    </CardTitle>
+                    </h2>
                     <CardDescription className="leading-relaxed line-clamp-3">
                       {guide.excerpt}
                     </CardDescription>
