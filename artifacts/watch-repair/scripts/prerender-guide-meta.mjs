@@ -5,6 +5,8 @@ const SITE_URL = "https://uppereastwatchrepair.com";
 // Branded 1200x630 PNG share card (public/og). PNG is universally supported by crawlers.
 const SHARE_IMAGE = `${SITE_URL}/og/upper-east-watch-repair-share.png`;
 const SHARE_IMAGE_ALT = "Upper East Watch Repair, 233 East 84th Street, New York. Start repair quote.";
+const WORKBENCH_IMAGE = `${SITE_URL}/media/upper-east-watch-repair-workbench-og.webp`;
+const WORKBENCH_IMAGE_ALT = "Watch repair workbench at Upper East Watch Repair.";
 // Retired services/guides: never prerender as content; redirect to watch repair.
 const RETIRED_PATHS = ["/services/jewelry-repair", "/guides/jewelry-repair-cost-nyc"];
 const REDIRECT_TARGET = "/services/watch-repair";
@@ -72,12 +74,15 @@ function renderMetadataDocument(template, {
   type,
   robots,
   extraHead = [],
+  image = SHARE_IMAGE,
+  imageType = "image/png",
+  imageAlt = SHARE_IMAGE_ALT,
 }) {
   const canonical = `${SITE_URL}${canonicalPath}`;
   const safeTitle = escapeAttribute(title);
   const safeDescription = escapeAttribute(description);
   const safeCanonical = escapeAttribute(canonical);
-  const safeImage = escapeAttribute(SHARE_IMAGE);
+  const safeImage = escapeAttribute(image);
 
   let html = template;
   // Remove template-level image tags so each route gets exactly one set.
@@ -126,12 +131,12 @@ function renderMetadataDocument(template, {
     `<meta property="og:image" content="${safeImage}" />`,
     `<meta property="og:image:width" content="1200" />`,
     `<meta property="og:image:height" content="630" />`,
-    `<meta property="og:image:type" content="image/png" />`,
-    `<meta property="og:image:alt" content="${escapeAttribute(SHARE_IMAGE_ALT)}" />`,
+    `<meta property="og:image:type" content="${escapeAttribute(imageType)}" />`,
+    `<meta property="og:image:alt" content="${escapeAttribute(imageAlt)}" />`,
     `<meta property="og:site_name" content="Upper East Watch Repair" />`,
     `<meta property="og:locale" content="en_US" />`,
     `<meta name="twitter:image" content="${safeImage}" />`,
-    `<meta name="twitter:image:alt" content="${escapeAttribute(SHARE_IMAGE_ALT)}" />`,
+    `<meta name="twitter:image:alt" content="${escapeAttribute(imageAlt)}" />`,
     ...(robots ? [`<meta name="robots" content="${robots}" />`] : []),
     ...extraHead,
   ].join("\n    ");
@@ -214,6 +219,9 @@ for (const page of publicPages) {
     description: page.description,
     canonicalPath: page.path,
     type: "website",
+    image: WORKBENCH_IMAGE,
+    imageType: "image/webp",
+    imageAlt: WORKBENCH_IMAGE_ALT,
   });
   if (page.path === "/") {
     await writeFile(path.join(publicDir, "index.html"), html);
