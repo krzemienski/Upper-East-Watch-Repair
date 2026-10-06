@@ -6,4 +6,9 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type AuthorizationSessionHeaderParameter = string;
+export type ListCustomersParams = {
+/**
+ * @maxLength 200
+ */
+search?: string;
+};

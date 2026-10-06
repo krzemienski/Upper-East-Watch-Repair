@@ -52,7 +52,7 @@ import {
 } from "drizzle-orm";
 import { createHash, randomBytes, randomUUID, timingSafeEqual } from "node:crypto";
 import express, { Router, type IRouter, type Request, type Response } from "express";
-import { isAdminUser } from "../lib/admin";
+import { ADMIN_ACTOR_ID, isAdminRequest } from "../lib/adminAuth";
 import {
   createLeadObjectPath,
   deletePrivateObject,
@@ -103,16 +103,8 @@ const cleanupTimer = setInterval(() => {
 }, RESERVATION_TTL_MS);
 cleanupTimer.unref();
 
-function requireAdmin(req: Request, res: Response): boolean {
-  if (!req.isAuthenticated()) {
-    res.status(401).json({ error: "Unauthorized" });
-    return false;
-  }
-  if (!isAdminUser(req.user)) {
-    res.status(403).json({ error: "Forbidden" });
-    return false;
-  }
-  return true;
+function requireAdmin(_req: Request, res: Response): boolean {
+  return isAdminRequest(res);
 }
 
 function hashToken(token: string): string {
@@ -589,6 +581,8 @@ router.get("/admin/leads", async (req, res): Promise<void> => {
   const filters: SQL[] = [];
   if (query.data.status) filters.push(eq(repairLeadsTable.status, query.data.status));
   if (query.data.source) filters.push(eq(repairLeadsTable.source, query.data.source));
+  if (query.data.intakeMode)
+    filters.push(eq(repairLeadsTable.intakeMode, query.data.intakeMode));
   if (query.data.from) filters.push(gte(repairLeadsTable.createdAt, query.data.from));
   if (query.data.to) filters.push(lte(repairLeadsTable.createdAt, query.data.to));
   if (query.data.search) {
@@ -655,6 +649,42 @@ router.get("/admin/leads/:id", async (req, res): Promise<void> => {
   );
 });
 
+const EDITABLE_DETAIL_FIELDS = [
+  "name",
+  "email",
+  "phone",
+  "preferredChannel",
+  "serviceNeeded",
+  "watchBrand",
+  "description",
+  "intakeMode",
+  "adminOwner",
+  "adminSummary",
+] as const;
+
+type LeadUpdateInput = ReturnType<typeof UpdateRepairLeadBody.parse>;
+
+/** Trim text and store blank optional fields as null. Consent/attribution are never accepted. */
+function normalizeLeadUpdate(input: LeadUpdateInput) {
+  const optional = (value: string | null | undefined) => {
+    const trimmed = value?.trim();
+    return trimmed ? trimmed : null;
+  };
+  const changes: Partial<typeof repairLeadsTable.$inferInsert> = {};
+  if (input.name !== undefined) changes.name = input.name.trim();
+  if (input.email !== undefined) changes.email = optional(input.email)?.toLowerCase() ?? null;
+  if (input.phone !== undefined) changes.phone = optional(input.phone);
+  if (input.preferredChannel !== undefined) changes.preferredChannel = input.preferredChannel;
+  if (input.serviceNeeded !== undefined) changes.serviceNeeded = optional(input.serviceNeeded);
+  if (input.watchBrand !== undefined) changes.watchBrand = optional(input.watchBrand);
+  if (input.description !== undefined) changes.description = input.description.trim();
+  if (input.intakeMode !== undefined) changes.intakeMode = input.intakeMode;
+  if (input.status !== undefined) changes.status = input.status;
+  if (input.adminOwner !== undefined) changes.adminOwner = optional(input.adminOwner);
+  if (input.adminSummary !== undefined) changes.adminSummary = optional(input.adminSummary);
+  return changes;
+}
+
 router.patch("/admin/leads/:id", async (req, res): Promise<void> => {
   if (!requireAdmin(req, res)) return;
   const params = UpdateRepairLeadParams.safeParse(req.params);
@@ -664,7 +694,10 @@ router.patch("/admin/leads/:id", async (req, res): Promise<void> => {
     !body.success ||
     Object.keys(body.success ? body.data : {}).length === 0
   ) {
-    res.status(400).json({ error: "Invalid lead update" });
+    const field = !body.success ? body.error.issues[0]?.path[0] : undefined;
+    res.status(400).json({
+      error: field ? `Invalid ${String(field)}. Check the value and try again.` : "Invalid lead update",
+    });
     return;
   }
   const updated = await db.transaction(async (tx) => {
@@ -673,19 +706,47 @@ router.patch("/admin/leads/:id", async (req, res): Promise<void> => {
       .from(repairLeadsTable)
       .where(eq(repairLeadsTable.id, params.data.id))
       .limit(1);
-    if (!existing) return null;
+    if (!existing) return { kind: "not_found" as const };
+    const changes = normalizeLeadUpdate(body.data);
+    if (changes.name === "") return { kind: "invalid" as const, error: "Name is required." };
+    if (changes.description === "") {
+      return { kind: "invalid" as const, error: "Repair description is required." };
+    }
+    const nextEmail = "email" in changes ? changes.email : existing.email;
+    const nextPhone = "phone" in changes ? changes.phone : existing.phone;
+    const nextChannel = changes.preferredChannel ?? existing.preferredChannel;
+    if (!nextEmail && !nextPhone) {
+      return { kind: "invalid" as const, error: "Keep at least a phone number or an email address." };
+    }
+    if (nextChannel === "email" && !nextEmail) {
+      return { kind: "invalid" as const, error: "Email follow-up needs an email address." };
+    }
+    if ((nextChannel === "phone" || nextChannel === "sms") && !nextPhone) {
+      return { kind: "invalid" as const, error: "Phone or text follow-up needs a phone number." };
+    }
     const [lead] = await tx
       .update(repairLeadsTable)
-      .set({ ...body.data, updatedAt: new Date() })
+      .set({ ...changes, updatedAt: new Date() })
       .where(eq(repairLeadsTable.id, existing.id))
       .returning();
+    const editedFields = EDITABLE_DETAIL_FIELDS.filter(
+      (field) => field in changes && changes[field] !== existing[field],
+    );
+    if (editedFields.length) {
+      await tx.insert(leadEventsTable).values({
+        leadId: existing.id,
+        type: "details_edited",
+        actorUserId: ADMIN_ACTOR_ID,
+        metadata: { fields: editedFields },
+      });
+    }
     if (body.data.status && body.data.status !== existing.status) {
       await tx.insert(leadEventsTable).values({
         leadId: existing.id,
         type: "status_changed",
         fromStatus: existing.status,
         toStatus: body.data.status,
-        actorUserId: req.user!.id,
+        actorUserId: ADMIN_ACTOR_ID,
       });
     }
     if (
@@ -702,13 +763,17 @@ router.patch("/admin/leads/:id", async (req, res): Promise<void> => {
           ),
         );
     }
-    return lead;
+    return { kind: "ok" as const, lead };
   });
-  if (!updated) {
+  if (updated.kind === "not_found") {
     res.status(404).json({ error: "Lead not found" });
     return;
   }
-  res.json(UpdateRepairLeadResponse.parse(omitNulls(updated)));
+  if (updated.kind === "invalid") {
+    res.status(400).json({ error: updated.error });
+    return;
+  }
+  res.json(UpdateRepairLeadResponse.parse(omitNulls(updated.lead)));
 });
 
 router.post("/admin/leads/:id/notes", async (req, res): Promise<void> => {
@@ -734,7 +799,7 @@ router.post("/admin/leads/:id/notes", async (req, res): Promise<void> => {
       leadId: lead.id,
       type: "note",
       note: body.data.note,
-      actorUserId: req.user!.id,
+      actorUserId: ADMIN_ACTOR_ID,
     })
     .returning();
   res.status(201).json(AddRepairLeadNoteResponse.parse(event));

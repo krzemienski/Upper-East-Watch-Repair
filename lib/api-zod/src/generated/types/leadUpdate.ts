@@ -6,8 +6,43 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { LeadStatus } from './leadStatus';
+import type { LeadUpdateIntakeMode } from './leadUpdateIntakeMode';
+import type { LeadUpdatePreferredChannel } from './leadUpdatePreferredChannel';
 
 export interface LeadUpdate {
+  /**
+     * @minLength 1
+     * @maxLength 160
+     */
+  name?: string;
+  /**
+     * @maxLength 320
+     * @nullable
+     */
+  email?: string | null;
+  /**
+     * @minLength 5
+     * @maxLength 40
+     * @nullable
+     */
+  phone?: string | null;
+  preferredChannel?: LeadUpdatePreferredChannel;
+  /**
+     * @maxLength 120
+     * @nullable
+     */
+  serviceNeeded?: string | null;
+  /**
+     * @maxLength 120
+     * @nullable
+     */
+  watchBrand?: string | null;
+  /**
+     * @minLength 1
+     * @maxLength 5000
+     */
+  description?: string;
+  intakeMode?: LeadUpdateIntakeMode;
   status?: LeadStatus;
   /**
      * @maxLength 160

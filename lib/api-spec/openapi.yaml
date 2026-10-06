@@ -15,7 +15,7 @@ tags:
   - name: admin
     description: Protected guide administration
   - name: Auth
-    description: Browser authentication endpoints
+    description: Shared-password admin sessions
 paths:
   /healthz:
     get:
@@ -177,60 +177,72 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorEnvelope"
-  /auth/user:
+  /admin/session:
     get:
       tags: [Auth]
-      operationId: getCurrentAuthUser
-      summary: Get the currently authenticated user
-      parameters:
-        - $ref: "#/components/parameters/AuthorizationSessionHeader"
-        - $ref: "#/components/parameters/SessionCookie"
+      operationId: getAdminSession
+      summary: Report whether the browser holds a valid admin session
       responses:
         "200":
-          description: Auth status resolved successfully
+          description: Admin session state
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminSession" }
+  /admin/login:
+    post:
+      tags: [Auth]
+      operationId: adminLogin
+      summary: Sign in to the admin panel with the shared admin password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AdminLoginInput" }
+      responses:
+        "200":
+          description: Signed in
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminSession" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429":
+          description: Too many failed attempts
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorEnvelope" }
+        "503":
+          description: Admin password is not configured
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorEnvelope" }
+  /admin/logout:
+    post:
+      tags: [Auth]
+      operationId: adminLogout
+      summary: End the current admin session
+      responses:
+        "200":
+          description: Signed out
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminSession" }
+  /admin/customers:
+    get:
+      operationId: listCustomers
+      tags: [admin]
+      summary: Customers grouped from repair requests by phone number and email
+      parameters:
+        - { name: search, in: query, schema: { type: string, maxLength: 200 } }
+      responses:
+        "200":
+          description: Customers, most recent request first
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthUserEnvelope"
-  /login:
-    get:
-      tags: [Auth]
-      operationId: beginBrowserLogin
-      summary: Start browser login
-      parameters:
-        - name: returnTo
-          in: query
-          required: false
-          schema:
-            type: string
-      responses:
-        "302":
-          description: Redirect to identity provider
-  /callback:
-    get:
-      tags: [Auth]
-      operationId: handleBrowserLoginCallback
-      summary: Complete browser login
-      responses:
-        "302":
-          description: Redirect after authentication
-  /logout:
-    get:
-      tags: [Auth]
-      operationId: logoutBrowserSession
-      summary: Clear the browser session
-      parameters:
-        - $ref: "#/components/parameters/AuthorizationSessionHeader"
-        - $ref: "#/components/parameters/SessionCookie"
-        - name: returnTo
-          in: query
-          required: false
-          schema:
-            type: string
-            default: /
-      responses:
-        "302":
-          description: Redirect after logout
+                type: array
+                items: { $ref: "#/components/schemas/Customer" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
   /funnel-events:
     post:
       operationId: createFunnelEvent
@@ -339,6 +351,7 @@ paths:
         - { name: status, in: query, schema: { $ref: "#/components/schemas/LeadStatus" } }
         - { name: search, in: query, schema: { type: string } }
         - { name: source, in: query, schema: { type: string } }
+        - { name: intakeMode, in: query, schema: { type: string, enum: [mail_in, in_store, unsure] } }
         - { name: from, in: query, schema: { type: string, format: date-time } }
         - { name: to, in: query, schema: { type: string, format: date-time } }
         - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 50 } }
@@ -497,18 +510,6 @@ components:
       in: header
       required: true
       schema: { type: string, minLength: 32 }
-    AuthorizationSessionHeader:
-      name: Authorization
-      in: header
-      required: false
-      schema:
-        type: string
-    SessionCookie:
-      name: sid
-      in: cookie
-      required: false
-      schema:
-        type: string
   schemas:
     LeadStatus:
       type: string
@@ -651,6 +652,14 @@ components:
       type: object
       minProperties: 1
       properties:
+        name: { type: string, minLength: 1, maxLength: 160 }
+        email: { type: [string, "null"], format: email, maxLength: 320 }
+        phone: { type: [string, "null"], minLength: 5, maxLength: 40 }
+        preferredChannel: { type: string, enum: [email, phone, sms, none] }
+        serviceNeeded: { type: [string, "null"], maxLength: 120 }
+        watchBrand: { type: [string, "null"], maxLength: 120 }
+        description: { type: string, minLength: 1, maxLength: 5000 }
+        intakeMode: { type: string, enum: [mail_in, in_store, unsure] }
         status: { $ref: "#/components/schemas/LeadStatus" }
         adminOwner: { type: [string, "null"], maxLength: 160 }
         adminSummary: { type: [string, "null"], maxLength: 5000 }
@@ -833,32 +842,50 @@ components:
         drafts:
           type: integer
           format: int32
-    AuthUser:
+    AdminSession:
       type: object
-      required: [id, email, firstName, lastName, profileImageUrl]
+      required: [authenticated, configured]
       properties:
-        id:
-          type: string
-        email:
-          type: [string, "null"]
-          format: email
-        firstName:
-          type: [string, "null"]
-        lastName:
-          type: [string, "null"]
-        profileImageUrl:
-          type: [string, "null"]
-        isAdmin:
+        authenticated: { type: boolean }
+        configured:
           type: boolean
-          description: Whether this authenticated identity may access guide administration
-    AuthUserEnvelope:
+          description: False when no admin password secret is set; admin access is then refused.
+        expiresAt: { type: string, format: date-time }
+    AdminLoginInput:
       type: object
-      required: [user]
+      required: [password]
       properties:
-        user:
-          oneOf:
-            - $ref: "#/components/schemas/AuthUser"
-            - type: "null"
+        password: { type: string, minLength: 1, maxLength: 256 }
+    CustomerRequest:
+      type: object
+      required: [id, status, intakeMode, description, createdAt]
+      properties:
+        id: { type: integer, format: int32 }
+        status: { $ref: "#/components/schemas/LeadStatus" }
+        intakeMode: { type: string, enum: [mail_in, in_store, unsure] }
+        serviceNeeded: { type: string }
+        watchBrand: { type: string }
+        watchModel: { type: string }
+        description: { type: string }
+        selectedCta: { type: string }
+        createdAt: { type: string, format: date-time }
+    Customer:
+      type: object
+      required: [key, name, names, emails, phones, requestCount, firstRequestAt, lastRequestAt, latestStatus, requests]
+      properties:
+        key: { type: string }
+        name: { type: string }
+        names: { type: array, items: { type: string } }
+        emails: { type: array, items: { type: string } }
+        phones: { type: array, items: { type: string } }
+        preferredChannel: { type: string, enum: [email, phone, sms, none] }
+        requestCount: { type: integer }
+        firstRequestAt: { type: string, format: date-time }
+        lastRequestAt: { type: string, format: date-time }
+        latestStatus: { $ref: "#/components/schemas/LeadStatus" }
+        requests:
+          type: array
+          items: { $ref: "#/components/schemas/CustomerRequest" }
     ErrorEnvelope:
       type: object
       required: [error]

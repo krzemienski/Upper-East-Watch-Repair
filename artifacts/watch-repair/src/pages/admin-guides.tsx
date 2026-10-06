@@ -5,8 +5,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useQueryClient } from '@tanstack/react-query';
 import {
-  LogIn,
-  LogOut,
   Plus,
   FileText,
   Eye,
@@ -14,9 +12,7 @@ import {
   Loader2,
   Check,
   X,
-  ShieldAlert,
 } from 'lucide-react';
-import { useAuth } from '@workspace/replit-auth-web';
 import {
   useListAdminGuides,
   useCreateGuide,
@@ -83,8 +79,7 @@ import {
 } from '@workspace/upper-east-horology/components/ui/alert-dialog';
 import { toast } from '@workspace/upper-east-horology/hooks/use-toast';
 import { cn } from '@workspace/upper-east-horology/lib/utils';
-import { PageMeta } from '@/components/PageMeta';
-import { Logo } from '@/components/Logo';
+import { AdminShell } from '@/components/admin/AdminShell';
 import { renderMarkdown, readingTime } from '@/lib/markdown';
 
 const guideFormSchema = z.object({
@@ -126,95 +121,9 @@ function slugify(s: string) {
     .replace(/-+/g, '-');
 }
 
-/* ---------------- Auth gate ---------------- */
-
-export default function AdminPage() {
-  const { isLoading, isAuthenticated, user, login, logout } = useAuth();
-
-  if (isLoading) {
-    return (
-      <div className="min-h-[70vh] flex items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (!isAuthenticated || !user) {
-    return (
-      <>
-        <PageMeta
-          title="Editor Sign In | Upper East Watch Repair"
-          description="Secure sign in for the Upper East Watch Repair guide editor."
-        />
-        <div className="min-h-[70vh] flex items-center justify-center px-4 py-16">
-          <Card className="w-full max-w-md">
-            <CardHeader className="text-center">
-              <div className="mx-auto mb-4">
-                <Logo className="h-10 w-auto mx-auto" />
-              </div>
-              <div className="mx-auto mb-2 h-11 w-11 rounded-md bg-primary/10 flex items-center justify-center">
-                <ShieldAlert className="h-5 w-5 text-primary" />
-              </div>
-              <CardTitle>Guide editor</CardTitle>
-              <CardDescription>
-                This area is restricted. Please sign in to manage guides.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button className="w-full" onClick={login} data-testid="button-login">
-                <LogIn className="h-4 w-4 mr-1.5" />
-                Log in
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </>
-    );
-  }
-
-  if (!user.isAdmin) {
-    return (
-      <>
-        <PageMeta
-          title="Editor Access Required | Upper East Watch Repair"
-          description="Restricted access for the Upper East Watch Repair guide editor."
-        />
-        <div className="min-h-[70vh] flex items-center justify-center px-4 py-16">
-          <Card className="w-full max-w-md">
-            <CardHeader className="text-center">
-              <div className="mx-auto mb-4">
-                <Logo className="h-10 w-auto mx-auto" />
-              </div>
-              <div className="mx-auto mb-2 h-11 w-11 rounded-md bg-primary/10 flex items-center justify-center">
-                <ShieldAlert className="h-5 w-5 text-primary" />
-              </div>
-              <CardTitle>Editor access required</CardTitle>
-              <CardDescription>
-                You are signed in, but this Replit account is not on the shop's editor
-                allowlist.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-xs text-muted-foreground text-center">
-                Signed-in user ID: <code className="text-foreground">{user.id}</code>
-              </p>
-              <Button className="w-full" variant="outline" onClick={logout} data-testid="button-logout">
-                <LogOut className="h-4 w-4 mr-1.5" />
-                Log out
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </>
-    );
-  }
-
-  return <AdminEditor userName={user.firstName ?? user.email ?? 'Editor'} onLogout={logout} />;
-}
-
 /* ---------------- Editor ---------------- */
 
-function AdminEditor({ userName, onLogout }: { userName: string; onLogout: () => void }) {
+export default function AdminGuidesPage() {
   const queryClient = useQueryClient();
   const { data: guides, isLoading, isError, refetch } = useListAdminGuides();
   const { data: summary } = useGetGuideSummary();
@@ -236,47 +145,17 @@ function AdminEditor({ userName, onLogout }: { userName: string; onLogout: () =>
   }
 
   return (
-    <>
-      <PageMeta
-        title="Guide Editor | Upper East Watch Repair"
-        description="Manage watch care guides for Upper East Watch Repair."
-      />
-
-      <div className="border-b border-border bg-card">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary mb-1">
-              Editor
-            </p>
-            <h1 className="font-serif text-2xl font-semibold text-foreground">
-              Guide management
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Signed in as {userName}
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link href="/admin/leads">
-              <Button variant="outline" data-testid="button-repair-leads">
-                Repair leads
-              </Button>
-            </Link>
-            <Button
-              onClick={() => setSelectedId('new')}
-              data-testid="button-new-guide"
-            >
-              <Plus className="h-4 w-4 mr-1" />
-              New guide
-            </Button>
-            <Button variant="outline" onClick={onLogout} data-testid="button-logout">
-              <LogOut className="h-4 w-4 mr-1.5" />
-              Log out
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+    <AdminShell
+      eyebrow="Editor"
+      title="Guide management"
+      description="Write and publish watch care guides."
+      actions={
+        <Button onClick={() => setSelectedId('new')} data-testid="button-new-guide">
+          <Plus className="h-4 w-4 mr-1" />
+          New guide
+        </Button>
+      }
+    >
         {/* Summary */}
         <div className="grid grid-cols-3 gap-4 mb-8">
           {[
@@ -405,10 +284,10 @@ function AdminEditor({ userName, onLogout }: { userName: string; onLogout: () =>
             )}
           </div>
         </div>
-      </div>
-    </>
+    </AdminShell>
   );
 }
+
 
 /* ---------------- Form ---------------- */
 

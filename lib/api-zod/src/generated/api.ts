@@ -174,54 +174,78 @@ export const GetGuideSummaryResponse = zod.object({
 
 
 /**
- * @summary Get the currently authenticated user
+ * @summary Report whether the browser holds a valid admin session
  */
-export const GetCurrentAuthUserHeader = zod.object({
-  "Authorization": zod.string().optional()
-})
-
-export const GetCurrentAuthUserResponse = zod.object({
-  "user": zod.union([zod.object({
-  "id": zod.string(),
-  "email": zod.email().nullable(),
-  "firstName": zod.string().nullable(),
-  "lastName": zod.string().nullable(),
-  "profileImageUrl": zod.string().nullable(),
-  "isAdmin": zod.boolean().optional().describe('Whether this authenticated identity may access guide administration')
-}),zod.null()])
+export const GetAdminSessionResponse = zod.object({
+  "authenticated": zod.boolean(),
+  "configured": zod.boolean().describe('False when no admin password secret is set; admin access is then refused.'),
+  "expiresAt": zod.coerce.date().optional()
 })
 
 
 /**
- * @summary Start browser login
+ * @summary Sign in to the admin panel with the shared admin password
  */
-export const BeginBrowserLoginQueryParams = zod.object({
-  "returnTo": zod.coerce.string().optional()
+export const adminLoginBodyPasswordMax = 256;
+
+
+
+export const AdminLoginBody = zod.object({
+  "password": zod.string().min(1).max(adminLoginBodyPasswordMax)
 })
 
-export const BeginBrowserLoginResponse = zod.void()
+export const AdminLoginResponse = zod.object({
+  "authenticated": zod.boolean(),
+  "configured": zod.boolean().describe('False when no admin password secret is set; admin access is then refused.'),
+  "expiresAt": zod.coerce.date().optional()
+})
 
 
 /**
- * @summary Complete browser login
+ * @summary End the current admin session
  */
-export const HandleBrowserLoginCallbackResponse = zod.void()
+export const AdminLogoutResponse = zod.object({
+  "authenticated": zod.boolean(),
+  "configured": zod.boolean().describe('False when no admin password secret is set; admin access is then refused.'),
+  "expiresAt": zod.coerce.date().optional()
+})
 
 
 /**
- * @summary Clear the browser session
+ * @summary Customers grouped from repair requests by phone number and email
  */
-export const logoutBrowserSessionQueryReturnToDefault = `/`;
+export const listCustomersQuerySearchMax = 200;
 
-export const LogoutBrowserSessionQueryParams = zod.object({
-  "returnTo": zod.coerce.string().default(logoutBrowserSessionQueryReturnToDefault)
+
+
+export const ListCustomersQueryParams = zod.object({
+  "search": zod.coerce.string().max(listCustomersQuerySearchMax).optional()
 })
 
-export const LogoutBrowserSessionHeader = zod.object({
-  "Authorization": zod.string().optional()
+export const ListCustomersResponseItem = zod.object({
+  "key": zod.string(),
+  "name": zod.string(),
+  "names": zod.array(zod.string()),
+  "emails": zod.array(zod.string()),
+  "phones": zod.array(zod.string()),
+  "preferredChannel": zod.enum(['email', 'phone', 'sms', 'none']).optional(),
+  "requestCount": zod.int(),
+  "firstRequestAt": zod.coerce.date(),
+  "lastRequestAt": zod.coerce.date(),
+  "latestStatus": zod.enum(['new', 'contacted', 'visit_planned', 'watch_received', 'estimate_pending', 'won', 'lost']),
+  "requests": zod.array(zod.object({
+  "id": zod.int(),
+  "status": zod.enum(['new', 'contacted', 'visit_planned', 'watch_received', 'estimate_pending', 'won', 'lost']),
+  "intakeMode": zod.enum(['mail_in', 'in_store', 'unsure']),
+  "serviceNeeded": zod.string().optional(),
+  "watchBrand": zod.string().optional(),
+  "watchModel": zod.string().optional(),
+  "description": zod.string(),
+  "selectedCta": zod.string().optional(),
+  "createdAt": zod.coerce.date()
+}))
 })
-
-export const LogoutBrowserSessionResponse = zod.void()
+export const ListCustomersResponse = zod.array(ListCustomersResponseItem)
 
 
 /**
@@ -577,6 +601,7 @@ export const ListRepairLeadsQueryParams = zod.object({
   "status": zod.enum(['new', 'contacted', 'visit_planned', 'watch_received', 'estimate_pending', 'won', 'lost']).optional(),
   "search": zod.coerce.string().optional(),
   "source": zod.coerce.string().optional(),
+  "intakeMode": zod.enum(['mail_in', 'in_store', 'unsure']).optional(),
   "from": zod.date().optional(),
   "to": zod.date().optional(),
   "limit": zod.coerce.number().int().min(1).max(listRepairLeadsQueryLimitMax).default(listRepairLeadsQueryLimitDefault),
@@ -802,6 +827,19 @@ export const UpdateRepairLeadParams = zod.object({
   "id": zod.coerce.number().int()
 })
 
+export const updateRepairLeadBodyNameMax = 160;
+
+export const updateRepairLeadBodyEmailMax = 320;
+
+export const updateRepairLeadBodyPhoneMin = 5;
+export const updateRepairLeadBodyPhoneMax = 40;
+
+export const updateRepairLeadBodyServiceNeededMax = 120;
+
+export const updateRepairLeadBodyWatchBrandMax = 120;
+
+export const updateRepairLeadBodyDescriptionMax = 5000;
+
 export const updateRepairLeadBodyAdminOwnerMax = 160;
 
 export const updateRepairLeadBodyAdminSummaryMax = 5000;
@@ -809,6 +847,14 @@ export const updateRepairLeadBodyAdminSummaryMax = 5000;
 
 
 export const UpdateRepairLeadBody = zod.object({
+  "name": zod.string().min(1).max(updateRepairLeadBodyNameMax).optional(),
+  "email": zod.email().max(updateRepairLeadBodyEmailMax).nullish(),
+  "phone": zod.string().min(updateRepairLeadBodyPhoneMin).max(updateRepairLeadBodyPhoneMax).nullish(),
+  "preferredChannel": zod.enum(['email', 'phone', 'sms', 'none']).optional(),
+  "serviceNeeded": zod.string().max(updateRepairLeadBodyServiceNeededMax).nullish(),
+  "watchBrand": zod.string().max(updateRepairLeadBodyWatchBrandMax).nullish(),
+  "description": zod.string().min(1).max(updateRepairLeadBodyDescriptionMax).optional(),
+  "intakeMode": zod.enum(['mail_in', 'in_store', 'unsure']).optional(),
   "status": zod.enum(['new', 'contacted', 'visit_planned', 'watch_received', 'estimate_pending', 'won', 'lost']).optional(),
   "adminOwner": zod.string().max(updateRepairLeadBodyAdminOwnerMax).nullish(),
   "adminSummary": zod.string().max(updateRepairLeadBodyAdminSummaryMax).nullish()

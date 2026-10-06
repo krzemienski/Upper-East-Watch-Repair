@@ -20,8 +20,10 @@ import AboutPage from '@/pages/about';
 import BookPage from '@/pages/book';
 import GuidesIndexPage from '@/pages/guides-index';
 import GuideArticlePage from '@/pages/guide-article';
-import AdminPage from '@/pages/admin';
 import AdminLeadsPage from '@/pages/admin-leads';
+import AdminCustomersPage from '@/pages/admin-customers';
+import AdminGuidesPage from '@/pages/admin-guides';
+import { AdminGate } from '@/components/admin/AdminGate';
 import RepairPage from '@/pages/repair';
 import RepairIntakePage from '@/pages/repair-intake';
 import DesignSystemRedirect from '@/pages/design-system-redirect';
@@ -63,8 +65,9 @@ function Router() {
     <RoutedErrorBoundary>
       <Switch>
         {/* Standalone routes without the marketing shell */}
-        <Route path="/admin/leads" component={AdminLeadsPage} />
-        <Route path="/admin" component={AdminPage} />
+        <Route path="/admin" nest>
+          <AdminRoutes />
+        </Route>
         <Route path="/repair/intake/in-store">
           <RepairIntakePage inStore />
         </Route>
@@ -76,6 +79,21 @@ function Router() {
         <Route component={SiteRoutes} />
       </Switch>
     </RoutedErrorBoundary>
+  );
+}
+
+/** Every /admin page sits behind the shared-password gate. */
+function AdminRoutes() {
+  return (
+    <AdminGate>
+      <Switch>
+        <Route path="/" component={AdminLeadsPage} />
+        <Route path="/leads" component={AdminLeadsPage} />
+        <Route path="/customers" component={AdminCustomersPage} />
+        <Route path="/guides" component={AdminGuidesPage} />
+        <Route><Redirect to="/" replace /></Route>
+      </Switch>
+    </AdminGate>
   );
 }
 

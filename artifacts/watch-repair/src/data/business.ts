@@ -5,9 +5,9 @@ export const WORKBENCH_OG_IMAGE_URL =
 /** Branded 1200x630 share card used for Open Graph and Twitter cards. */
 export const SHARE_IMAGE_URL = `${SITE_URL}/og/upper-east-watch-repair-share.png`;
 
-/** Public shop phone, supplied at build time. When unset, call CTAs are hidden. */
-export const BUSINESS_PHONE = (import.meta.env.VITE_BUSINESS_PHONE as string | undefined)?.trim() || '';
-export const TEL_URL = BUSINESS_PHONE ? `tel:${BUSINESS_PHONE.replace(/[^\d+]/g, '')}` : '';
+/** Confirmed public shop number; use the international form for tap-to-call. */
+export const BUSINESS_PHONE = '347-791-6907';
+export const TEL_URL = 'tel:+13477916907';
 export const STREET_ADDRESS = '233 East 84th Street';
 export const ADDRESS_LOCALITY = 'New York';
 export const ADDRESS_REGION = 'NY';

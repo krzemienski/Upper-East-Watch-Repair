@@ -6,11 +6,13 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { LeadStatus } from './leadStatus';
+import type { ListRepairLeadsIntakeMode } from './listRepairLeadsIntakeMode';
 
 export type ListRepairLeadsParams = {
 status?: LeadStatus;
 search?: string;
 source?: string;
+intakeMode?: ListRepairLeadsIntakeMode;
 from?: Date;
 to?: Date;
 /**

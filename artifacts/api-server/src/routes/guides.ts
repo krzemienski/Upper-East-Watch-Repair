@@ -13,25 +13,12 @@ import {
 import { db, guidesTable } from "@workspace/db";
 import { and, desc, eq, sql } from "drizzle-orm";
 import { Router, type IRouter, type Request, type Response } from "express";
-import { isAdminUser } from "../lib/admin";
+import { isAdminRequest } from "../lib/adminAuth";
 
 const router: IRouter = Router();
 
-function requireAdmin(req: Request, res: Response): boolean {
-  if (!req.isAuthenticated()) {
-    req.log.warn("Rejected unauthenticated guide-editor request");
-    res.status(401).json({ error: "Unauthorized" });
-    return false;
-  }
-
-  if (isAdminUser(req.user)) return true;
-
-  req.log.warn(
-    { userId: req.user.id },
-    "Rejected guide-editor request from non-admin user",
-  );
-  res.status(403).json({ error: "Forbidden" });
-  return false;
+function requireAdmin(_req: Request, res: Response): boolean {
+  return isAdminRequest(res);
 }
 
 function isUniqueViolation(error: unknown): boolean {
@@ -90,7 +77,7 @@ router.get("/admin/guides", async (req, res): Promise<void> => {
     .orderBy(desc(guidesTable.updatedAt), desc(guidesTable.createdAt));
 
   req.log.debug(
-    { count: guides.length, userId: req.user?.id },
+    { count: guides.length },
     "Listed guides for editor",
   );
   res.json(ListAdminGuidesResponse.parse(guides));
@@ -135,7 +122,7 @@ router.post("/admin/guides", async (req, res): Promise<void> => {
       .returning();
 
     req.log.info(
-      { guideId: guide.id, status: guide.status, userId: req.user?.id },
+      { guideId: guide.id, status: guide.status },
       "Created guide",
     );
     res.status(201).json(CreateGuideResponse.parse(guide));
@@ -199,7 +186,7 @@ router.patch("/admin/guides/:id", async (req, res): Promise<void> => {
       .returning();
 
     req.log.info(
-      { guideId: guide.id, status: guide.status, userId: req.user?.id },
+      { guideId: guide.id, status: guide.status },
       "Updated guide",
     );
     res.json(UpdateGuideResponse.parse(guide));

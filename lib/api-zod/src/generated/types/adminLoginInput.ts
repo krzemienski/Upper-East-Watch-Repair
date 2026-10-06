@@ -5,8 +5,11 @@
  * Upper East Watch Repair API
  * OpenAPI spec version: 0.1.0
  */
-import type { AuthUser } from './authUser';
 
-export interface AuthUserEnvelope {
-  user: AuthUser | null;
+export interface AdminLoginInput {
+  /**
+     * @minLength 1
+     * @maxLength 256
+     */
+  password: string;
 }

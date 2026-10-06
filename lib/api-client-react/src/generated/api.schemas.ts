@@ -247,7 +247,59 @@ export interface RepairLeadDetail {
   followUps: FollowUpTask[];
 }
 
+export type LeadUpdatePreferredChannel = typeof LeadUpdatePreferredChannel[keyof typeof LeadUpdatePreferredChannel];
+
+
+export const LeadUpdatePreferredChannel = {
+  email: 'email',
+  phone: 'phone',
+  sms: 'sms',
+  none: 'none',
+} as const;
+
+export type LeadUpdateIntakeMode = typeof LeadUpdateIntakeMode[keyof typeof LeadUpdateIntakeMode];
+
+
+export const LeadUpdateIntakeMode = {
+  mail_in: 'mail_in',
+  in_store: 'in_store',
+  unsure: 'unsure',
+} as const;
+
 export interface LeadUpdate {
+  /**
+     * @minLength 1
+     * @maxLength 160
+     */
+  name?: string;
+  /**
+     * @maxLength 320
+     * @nullable
+     */
+  email?: string | null;
+  /**
+     * @minLength 5
+     * @maxLength 40
+     * @nullable
+     */
+  phone?: string | null;
+  preferredChannel?: LeadUpdatePreferredChannel;
+  /**
+     * @maxLength 120
+     * @nullable
+     */
+  serviceNeeded?: string | null;
+  /**
+     * @maxLength 120
+     * @nullable
+     */
+  watchBrand?: string | null;
+  /**
+     * @minLength 1
+     * @maxLength 5000
+     */
+  description?: string;
+  intakeMode?: LeadUpdateIntakeMode;
   status?: LeadStatus;
   /**
      * @maxLength 160
@@ -418,22 +470,64 @@ export interface GuideSummary {
   drafts: number;
 }
 
-export interface AuthUser {
-  id: string;
-  /** @nullable */
-  email: string | null;
-  /** @nullable */
-  firstName: string | null;
-  /** @nullable */
-  lastName: string | null;
-  /** @nullable */
-  profileImageUrl: string | null;
-  /** Whether this authenticated identity may access guide administration */
-  isAdmin?: boolean;
+export interface AdminSession {
+  authenticated: boolean;
+  /** False when no admin password secret is set; admin access is then refused. */
+  configured: boolean;
+  expiresAt?: string;
 }
 
-export interface AuthUserEnvelope {
-  user: AuthUser | null;
+export interface AdminLoginInput {
+  /**
+     * @minLength 1
+     * @maxLength 256
+     */
+  password: string;
+}
+
+export type CustomerRequestIntakeMode = typeof CustomerRequestIntakeMode[keyof typeof CustomerRequestIntakeMode];
+
+
+export const CustomerRequestIntakeMode = {
+  mail_in: 'mail_in',
+  in_store: 'in_store',
+  unsure: 'unsure',
+} as const;
+
+export interface CustomerRequest {
+  id: number;
+  status: LeadStatus;
+  intakeMode: CustomerRequestIntakeMode;
+  serviceNeeded?: string;
+  watchBrand?: string;
+  watchModel?: string;
+  description: string;
+  selectedCta?: string;
+  createdAt: string;
+}
+
+export type CustomerPreferredChannel = typeof CustomerPreferredChannel[keyof typeof CustomerPreferredChannel];
+
+
+export const CustomerPreferredChannel = {
+  email: 'email',
+  phone: 'phone',
+  sms: 'sms',
+  none: 'none',
+} as const;
+
+export interface Customer {
+  key: string;
+  name: string;
+  names: string[];
+  emails: string[];
+  phones: string[];
+  preferredChannel?: CustomerPreferredChannel;
+  requestCount: number;
+  firstRequestAt: string;
+  lastRequestAt: string;
+  latestStatus: LeadStatus;
+  requests: CustomerRequest[];
 }
 
 export interface ErrorEnvelope {
@@ -457,20 +551,18 @@ export type NotFoundResponse = ErrorEnvelope;
 
 export type UploadTokenParameter = string;
 
-export type AuthorizationSessionHeaderParameter = string;
-
-export type BeginBrowserLoginParams = {
-returnTo?: string;
-};
-
-export type LogoutBrowserSessionParams = {
-returnTo?: string;
+export type ListCustomersParams = {
+/**
+ * @maxLength 200
+ */
+search?: string;
 };
 
 export type ListRepairLeadsParams = {
 status?: LeadStatus;
 search?: string;
 source?: string;
+intakeMode?: ListRepairLeadsIntakeMode;
 from?: string;
 to?: string;
 /**
@@ -483,6 +575,15 @@ limit?: number;
  */
 offset?: number;
 };
+
+export type ListRepairLeadsIntakeMode = typeof ListRepairLeadsIntakeMode[keyof typeof ListRepairLeadsIntakeMode];
+
+
+export const ListRepairLeadsIntakeMode = {
+  mail_in: 'mail_in',
+  in_store: 'in_store',
+  unsure: 'unsure',
+} as const;
 
 export type ListFollowUpsParams = {
 status?: ListFollowUpsStatus;
