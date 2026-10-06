@@ -218,7 +218,7 @@ export default function HomePage() {
                 On the bench today
               </p>
               <p className="text-foreground leading-relaxed">
-                From a stopped vintage automatic to a loose engagement-ring prong — every
+                From a stopped vintage automatic to a worn watch bracelet — every
                 job gets the same steady hands and full attention.
               </p>
             </CardContent>

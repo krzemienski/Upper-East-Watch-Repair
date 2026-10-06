@@ -100,7 +100,7 @@ function CustomerCard({ customer }: { customer: Customer }) {
           <ul className="divide-y divide-border rounded-md border border-border">
             {customer.requests.map((request) => (
               <li key={request.id}>
-                <Link href={`/leads?lead=${request.id}`} className="flex items-center gap-3 p-3 hover-elevate" data-testid={`link-customer-request-${request.id}`}>
+                <Link href={`/?lead=${request.id}`} className="flex items-center gap-3 p-3 hover-elevate" data-testid={`link-customer-request-${request.id}`}>
                   <div className="min-w-0 flex-1">
                     <p className="font-medium truncate">
                       {[request.watchBrand, request.watchModel, request.serviceNeeded ? serviceLabel(request.serviceNeeded) : null].filter(Boolean).join(' · ') || request.description}

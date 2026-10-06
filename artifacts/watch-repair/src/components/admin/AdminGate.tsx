@@ -53,11 +53,12 @@ export function AdminGate({ children }: { children: ReactNode }) {
 
   function signOut() {
     logout.mutate(undefined, {
-      onSettled: () => {
+      onSuccess: () => {
         queryClient.removeQueries({ predicate: (query) => String(query.queryKey[0] ?? '').startsWith('/api/admin') && query.queryKey[0] !== '/api/admin/session' });
         void queryClient.invalidateQueries({ queryKey: getGetAdminSessionQueryKey() });
         toast({ title: 'Signed out' });
       },
+      onError: () => toast({ title: 'Could not sign out. Please try again.', variant: 'destructive' }),
     });
   }
 

@@ -88,7 +88,7 @@ function AdminRoutes() {
     <AdminGate>
       <Switch>
         <Route path="/" component={AdminLeadsPage} />
-        <Route path="/leads" component={AdminLeadsPage} />
+        <Route path="/leads"><Redirect to="/" replace /></Route>
         <Route path="/customers" component={AdminCustomersPage} />
         <Route path="/guides" component={AdminGuidesPage} />
         <Route><Redirect to="/" replace /></Route>

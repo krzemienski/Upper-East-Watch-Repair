@@ -4,6 +4,7 @@ import { History, Image, Loader2, Mail, MessageSquarePlus, Pencil, Phone, Watch 
 import {
   getGetRepairLeadQueryKey,
   getListCustomersQueryKey,
+  getListFollowUpsQueryKey,
   getListRepairLeadsQueryKey,
   useAddRepairLeadNote,
   useUpdateRepairLead,
@@ -56,6 +57,7 @@ export function LeadDetail({ detail }: { detail: RepairLeadDetail }) {
     void queryClient.invalidateQueries({ queryKey: getGetRepairLeadQueryKey(lead.id) });
     void queryClient.invalidateQueries({ queryKey: getListRepairLeadsQueryKey() });
     void queryClient.invalidateQueries({ queryKey: getListCustomersQueryKey() });
+    void queryClient.invalidateQueries({ queryKey: getListFollowUpsQueryKey() });
     void queryClient.invalidateQueries({ queryKey: ['/api/admin/leads/report'] });
   }
 

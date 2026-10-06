@@ -2,6 +2,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { CalendarClock, Check, Loader2 } from 'lucide-react';
 import {
   getListFollowUpsQueryKey,
+  getGetRepairLeadQueryKey,
   useListFollowUps,
   useUpdateFollowUp,
   type FollowUpTask,
@@ -31,6 +32,7 @@ export function FollowUpQueue({ leadNames, onOpenLead }: { leadNames: Map<number
         onSuccess: () => {
           toast({ title });
           void queryClient.invalidateQueries({ queryKey: getListFollowUpsQueryKey() });
+          void queryClient.invalidateQueries({ queryKey: getGetRepairLeadQueryKey(item.leadId) });
         },
         onError: (error) => toast({ title: apiErrorMessage(error, 'Could not update follow-up.'), variant: 'destructive' }),
       },
