@@ -24,3 +24,8 @@ channel = "stable-25_05"
 
 [objectStorage]
 defaultBucketID = "replit-objstore-7eb84c13-27a7-456a-b2fd-71ceb6c84fe1"
+
+[userenv]
+
+[userenv.shared]
+LEAD_ALERT_EMAIL_TO = "Rubinovmichael870@gmail.com"
