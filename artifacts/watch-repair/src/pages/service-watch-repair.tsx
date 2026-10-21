@@ -106,7 +106,7 @@ export default function ServiceWatchRepairPage() {
                   <div className="h-11 w-11 rounded-md bg-primary/10 flex items-center justify-center mb-2">
                     <Icon className="h-5 w-5 text-primary" />
                   </div>
-                  <CardTitle>{c.title}</CardTitle>
+                  <CardTitle as="h3">{c.title}</CardTitle>
                   <CardDescription className="leading-relaxed">{c.description}</CardDescription>
                 </CardHeader>
               </Card>

@@ -135,7 +135,7 @@ export default function HomePage() {
                   <div className="h-11 w-11 rounded-md bg-primary/10 flex items-center justify-center mb-3">
                     <Icon className="h-5 w-5 text-primary" />
                   </div>
-                  <CardTitle className="font-serif text-2xl">{service.title}</CardTitle>
+                  <CardTitle as="h3" className="font-serif text-2xl">{service.title}</CardTitle>
                   <CardDescription className="leading-relaxed">
                     {service.description}
                   </CardDescription>

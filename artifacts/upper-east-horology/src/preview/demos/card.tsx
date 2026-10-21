@@ -12,7 +12,7 @@ export function CardDemo() {
   return (
     <Card className="max-w-md">
       <CardHeader>
-        <CardTitle>Weekly report</CardTitle>
+        <CardTitle as="h2">Weekly report</CardTitle>
         <CardDescription>Activity across your workspace.</CardDescription>
       </CardHeader>
       <CardContent>

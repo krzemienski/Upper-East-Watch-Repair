@@ -467,7 +467,7 @@ export const NAV_GROUPS: NavGroup[] = [
       {
         id: 'card',
         name: 'Card',
-        description: 'Grouped content with header, body, and footer.',
+        description: 'Grouped content with header, body, footer, and optional native heading titles.',
         Page: CardDemo,
       },
       {

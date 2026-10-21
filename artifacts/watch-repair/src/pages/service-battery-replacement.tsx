@@ -121,7 +121,7 @@ export default function ServiceBatteryReplacementPage() {
                   <div className="h-11 w-11 rounded-md bg-primary/10 flex items-center justify-center mb-2">
                     <Icon className="h-5 w-5 text-primary" />
                   </div>
-                  <CardTitle>{s.title}</CardTitle>
+                  <CardTitle as="h3">{s.title}</CardTitle>
                   <CardDescription className="leading-relaxed">{s.description}</CardDescription>
                 </CardHeader>
               </Card>

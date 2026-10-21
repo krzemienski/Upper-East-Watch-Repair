@@ -134,7 +134,7 @@ function CalFallback() {
         <div className="h-11 w-11 rounded-md bg-primary/10 flex items-center justify-center mb-2">
           <CalendarClock className="h-5 w-5 text-primary" />
         </div>
-        <CardTitle>Online booking is being set up</CardTitle>
+        <CardTitle as="h2">Online booking is being set up</CardTitle>
         <CardDescription>
           Our online scheduler isn't connected yet — but you can still reach us to book
           your repair.
