@@ -61,6 +61,7 @@ import {
   pipePrivateObject,
   writePrivateObject,
 } from "../lib/objectStorage";
+import { sendNewLeadAlert } from "../lib/leadAlerts";
 import { logger } from "../lib/logger";
 
 const router: IRouter = Router();
@@ -215,6 +216,7 @@ router.post("/leads", async (req, res): Promise<void> => {
       uploadTokenExpiresAt,
     }),
   );
+  void sendNewLeadAlert(lead, `${req.protocol}://${req.host}`);
 });
 
 router.post("/leads/:id/uploads/request-url", async (req, res): Promise<void> => {
