@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { Link, useParams } from 'wouter';
-import { ChevronRight, ArrowLeft, Clock, AlertCircle, ListTree } from 'lucide-react';
+import { ArrowLeft, Clock, AlertCircle, ListTree } from 'lucide-react';
+import { PublicBreadcrumb } from '@/components/PublicBreadcrumb';
 import {
   useGetPublishedGuide,
   getGetPublishedGuideQueryKey,
@@ -95,17 +96,11 @@ export default function GuideArticlePage() {
       <ArticleJsonLd guide={guide} />
 
       <Section className="pt-12 lg:pt-16">
-        <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-8" aria-label="Breadcrumb">
-          <Link href="/" className="hover:text-foreground transition-colors" data-testid="breadcrumb-home">
-            Home
-          </Link>
-          <ChevronRight className="h-3.5 w-3.5" />
-          <Link href="/guides" className="hover:text-foreground transition-colors" data-testid="breadcrumb-guides">
-            Guides
-          </Link>
-          <ChevronRight className="h-3.5 w-3.5" />
-          <span className="text-foreground truncate max-w-[50vw]">{guide.title}</span>
-        </nav>
+        <PublicBreadcrumb className="mb-8" items={[
+          { name: 'Home', path: '/' },
+          { name: 'Guides', path: '/guides' },
+          { name: guide.title, path: `/guides/${guide.slug}` },
+        ]} />
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-12">
           {/* Article */}

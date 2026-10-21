@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { Link } from 'wouter';
-import { ChevronRight, ArrowRight, BookOpen, AlertCircle, Clock } from 'lucide-react';
+import { ArrowRight, BookOpen, AlertCircle, Clock } from 'lucide-react';
+import { PublicBreadcrumb } from '@/components/PublicBreadcrumb';
 import {
   useListPublishedGuides,
 } from '@workspace/api-client-react';
@@ -59,13 +60,7 @@ export default function GuidesIndexPage() {
       />
 
       <Section className="pt-12 lg:pt-16 pb-8">
-        <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-6" aria-label="Breadcrumb">
-          <Link href="/" className="hover:text-foreground transition-colors" data-testid="breadcrumb-home">
-            Home
-          </Link>
-          <ChevronRight className="h-3.5 w-3.5" />
-          <span className="text-foreground">Guides</span>
-        </nav>
+        <PublicBreadcrumb items={[{ name: 'Home', path: '/' }, { name: 'Guides', path: '/guides' }]} />
 
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_22rem] gap-10 lg:gap-16 items-end">
           <div className="max-w-2xl">

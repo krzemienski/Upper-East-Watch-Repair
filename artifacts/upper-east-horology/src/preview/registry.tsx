@@ -479,7 +479,7 @@ export const NAV_GROUPS: NavGroup[] = [
       {
         id: 'accordion',
         name: 'Accordion',
-        description: 'Expandable sections for progressive disclosure.',
+        description: 'Expandable sections, including force-mounted content hidden when collapsed.',
         Page: AccordionDemo,
       },
       {

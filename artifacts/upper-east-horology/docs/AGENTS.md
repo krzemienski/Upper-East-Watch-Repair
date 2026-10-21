@@ -7,6 +7,9 @@ on it and import its theme and components directly.
 
 ## What's here
 
+- Accordion content supports `forceMount` for server-rendered answers; closed
+  force-mounted panels use `display: none` to stay hidden and non-focusable.
+
 - `tokens.json` — the single source of truth (DTCG format): colors (full light
   and dark sets), typography, spacing, and radius.
 - `scripts/build-tokens.mjs` — generates the outputs below from `tokens.json`.

@@ -84,6 +84,7 @@ export default function ServiceWatchRepairPage() {
         description="Expert watch repair on the Upper East Side — quartz through high-end mechanical movements, all brands. Overhauls, crystals, crowns, and water-resistance restoration at 233 East 84th Street."
       />
       <ServiceHero
+        path="/services/watch-repair"
         eyebrow="Watch Repair"
         title="From quartz to high complications"
         description="Whether it's a daily quartz watch or a treasured mechanical piece, every movement is serviced at our bench with precision and patience — all brands welcome."
@@ -141,7 +142,7 @@ export default function ServiceWatchRepairPage() {
             {faqs.map((faq, i) => (
               <AccordionItem key={i} value={`item-${i}`} data-testid={`faq-${i}`}>
                 <AccordionTrigger className="text-left">{faq.q}</AccordionTrigger>
-                <AccordionContent className="text-muted-foreground leading-relaxed">
+                <AccordionContent forceMount className="text-muted-foreground leading-relaxed">
                   {faq.a}
                 </AccordionContent>
               </AccordionItem>

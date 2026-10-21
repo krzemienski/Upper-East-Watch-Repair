@@ -1,7 +1,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { createServer } from 'vite';
-import { renderDocument, renderSitemap, renderRobots, PUBLIC_PATHS, site } from './prerender-document.mjs';
+import { renderDocument, renderSitemap, renderRobots, renderLlms, PUBLIC_PATHS, site } from './prerender-document.mjs';
 
 const artifactDir = path.resolve(import.meta.dirname, '..');
 const publicDir = path.join(artifactDir, 'dist/public');
@@ -41,9 +41,11 @@ try {
   for (const route of ['/admin', '/admin/leads', '/repair/intake/in-store']) await writeRoute(route, fallback);
   await writeFile(path.join(publicDir, 'sitemap.xml'), renderSitemap(routes));
   await writeFile(path.join(publicDir, 'robots.txt'), renderRobots());
+  await writeFile(path.join(publicDir, 'llms.txt'), renderLlms(guides));
   // Keep source discovery files synchronized as well; domain/route edits cannot drift.
   await writeFile(path.join(artifactDir, 'public/sitemap.xml'), renderSitemap(routes));
   await writeFile(path.join(artifactDir, 'public/robots.txt'), renderRobots());
+  await writeFile(path.join(artifactDir, 'public/llms.txt'), renderLlms(guides));
   console.info(`Rendered full HTML for ${routes.length} public routes (${guides.length} published guides).`);
 } finally {
   await closeGuideConnection?.();

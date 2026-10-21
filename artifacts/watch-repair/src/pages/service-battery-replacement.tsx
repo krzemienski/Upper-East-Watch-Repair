@@ -82,6 +82,7 @@ export default function ServiceBatteryReplacementPage() {
         description="Swiss battery replacement from $15 to $50 with water-resistance testing at 233 East 84th Street. Genuine batteries, movement inspection, and most watches done while you wait."
       />
       <ServiceHero
+        path="/services/battery-replacement"
         eyebrow="Battery Replacement"
         title="Swiss batteries, done right"
         description="A fresh battery is the most common watch service — and one we take seriously. Genuine Swiss batteries, water-resistance care, and honest pricing from $15 to $50 depending on watch complexity."
@@ -155,7 +156,7 @@ export default function ServiceBatteryReplacementPage() {
             {faqs.map((faq, i) => (
               <AccordionItem key={i} value={`item-${i}`} data-testid={`faq-${i}`}>
                 <AccordionTrigger className="text-left">{faq.q}</AccordionTrigger>
-                <AccordionContent className="text-muted-foreground leading-relaxed">
+                <AccordionContent forceMount className="text-muted-foreground leading-relaxed">
                   {faq.a}
                 </AccordionContent>
               </AccordionItem>

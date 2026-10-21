@@ -1,0 +1,24 @@
+# Upper East Watch Repair
+
+> A neighborhood watch repair shop at 233 East 84th Street, New York, NY, serving Manhattan’s Upper East Side and nearby watch owners.
+
+Watch-only services include quartz and mechanical watch repair, battery replacement, and water-resistance care. Jewelry repair is not offered. Consult the service pages for current service details and the published guides for watch-care advice.
+
+## Services and shop information
+- [Watch repair](https://uppereastwatchrepair.com/services/watch-repair): Quartz and mechanical service, movement diagnosis, crowns, crystals, and water-resistance restoration.
+- [Battery replacement](https://uppereastwatchrepair.com/services/battery-replacement): Swiss watch batteries, pricing, gasket checks, and pressure-testing policy.
+- [About the shop](https://uppereastwatchrepair.com/about): Shop location, hours, and directions on the Upper East Side.
+- [Book an appointment](https://uppereastwatchrepair.com/book): Arrange a watch-service visit; walk-ins are also welcome during shop hours.
+
+## Watch-care guides
+- [Watch care guide library](https://uppereastwatchrepair.com/guides): The authoritative index of published watch-care guides from the shop.
+- [Watch Water Resistance and Pressure Testing Explained](https://uppereastwatchrepair.com/guides/watch-water-resistance-pressure-testing): Understand what a watch's water-resistance rating means, how seals age, what pressure tests can reveal, and what to check before swimming.
+- [Watch Repair Cost in NYC: A Practical 2026 Guide](https://uppereastwatchrepair.com/guides/watch-repair-cost-nyc): Understand the factors behind a watch repair estimate, typical NYC planning ranges, and the questions to ask before authorizing work.
+- [How to Replace a Watch Battery at Home Safely](https://uppereastwatchrepair.com/guides/how-to-replace-watch-battery-at-home): A careful home battery-change method for inexpensive, simple quartz watches, including clear reasons to stop and take the watch to a professional.
+- [Best Watch Repair Tools on Amazon: A Safe Buying Guide](https://uppereastwatchrepair.com/guides/best-watch-repair-tools-amazon): Build a sensible beginner kit for strap changes and inexpensive quartz battery jobs without buying tools you cannot safely use.
+- [Vintage Watch Care: A Preservation-First Guide](https://uppereastwatchrepair.com/guides/vintage-watch-care-guide): Practical steps for protecting an older watch while respecting its original character, from daily wear and storage to cleaning and service decisions.
+- [Watch Battery Replacement Cost in NYC: 2026 Guide](https://uppereastwatchrepair.com/guides/watch-battery-replacement-cost-nyc): Practical 2026 NYC planning ranges for watch battery replacement, with the case, gasket, testing, and movement factors that can affect a quote.
+- [How Often Should a Watch Be Serviced?](https://uppereastwatchrepair.com/guides/how-often-should-a-watch-be-serviced): A practical guide to service timing for quartz and mechanical watches, including warning signs, use and storage factors, and what proper service involves.
+- [How Much Is My Rolex Worth? A Complete Valuation Guide](https://uppereastwatchrepair.com/guides/how-much-is-my-rolex-worth): Model, condition, box and papers, service history—the factors that determine a Rolex's value, explained by an NYC watch-repair bench.
+
+This optional index does not grant crawler permissions or replace robots.txt or sitemap.xml.

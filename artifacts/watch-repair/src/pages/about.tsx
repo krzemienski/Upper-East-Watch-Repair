@@ -1,5 +1,6 @@
 import { Link } from 'wouter';
-import { MapPin, Clock, ArrowRight, ChevronRight, Navigation } from 'lucide-react';
+import { MapPin, Clock, ArrowRight, Navigation } from 'lucide-react';
+import { PublicBreadcrumb } from '@/components/PublicBreadcrumb';
 import { Button } from '@workspace/upper-east-horology/components/ui/button';
 import { Card, CardContent } from '@workspace/upper-east-horology/components/ui/card';
 import { Separator } from '@workspace/upper-east-horology/components/ui/separator';
@@ -29,13 +30,7 @@ export default function AboutPage() {
         <WatchPoster className="absolute inset-0 w-full h-full" />
         <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/70 to-background" />
         <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-20 lg:py-28">
-          <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-6" aria-label="Breadcrumb">
-            <Link href="/" className="hover:text-foreground transition-colors" data-testid="breadcrumb-home">
-              Home
-            </Link>
-            <ChevronRight className="h-3.5 w-3.5" />
-            <span className="text-foreground">About</span>
-          </nav>
+          <PublicBreadcrumb items={[{ name: 'Home', path: '/' }, { name: 'About', path: '/about' }]} />
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary mb-4">
             Our story
           </p>

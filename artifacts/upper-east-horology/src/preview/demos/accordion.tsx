@@ -15,6 +15,13 @@ export function AccordionDemo() {
             Yes. It follows keyboard and screen-reader interaction patterns.
           </AccordionContent>
         </AccordionItem>
+        <AccordionItem value="item-3">
+          <AccordionTrigger>Can answers stay in the initial HTML?</AccordionTrigger>
+          <AccordionContent forceMount>
+            Yes. Force-mounted content stays in the document, but display: none
+            keeps closed answers hidden and their controls out of keyboard navigation.
+          </AccordionContent>
+        </AccordionItem>
         <AccordionItem value="item-2">
           <AccordionTrigger>Can it be animated?</AccordionTrigger>
           <AccordionContent>

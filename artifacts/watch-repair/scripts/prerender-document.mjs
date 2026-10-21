@@ -62,3 +62,34 @@ export function renderSitemap(routes) {
 export function renderRobots() {
   return `User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /repair/intake/in-store\nSitemap: ${site.siteUrl}/sitemap.xml\n`;
 }
+
+/** Concise, optional discovery index, using only the published build snapshot. */
+export function renderLlms(guides) {
+  const plain = (value) => String(value || '').replace(/<[^>]*>/g, '')
+    .replace(/[\r\n\t]+/g, ' ').replace(/\s+/g, ' ').trim();
+  const label = (value) => plain(value).replace(/[\\[\]]/g, '\\$&');
+  const link = (name, route, description) =>
+    `- [${label(name)}](${site.siteUrl}${route}): ${plain(description).slice(0, 220)}`;
+  const published = guides.filter((guide) => guide.status === 'published'
+    && !site.retiredPaths.includes(`/guides/${guide.slug}`));
+  return [
+    '# Upper East Watch Repair',
+    '',
+    '> A neighborhood watch repair shop at 233 East 84th Street, New York, NY, serving Manhattan’s Upper East Side and nearby watch owners.',
+    '',
+    'Watch-only services include quartz and mechanical watch repair, battery replacement, and water-resistance care. Jewelry repair is not offered. Consult the service pages for current service details and the published guides for watch-care advice.',
+    '',
+    '## Services and shop information',
+    link('Watch repair', '/services/watch-repair', 'Quartz and mechanical service, movement diagnosis, crowns, crystals, and water-resistance restoration.'),
+    link('Battery replacement', '/services/battery-replacement', 'Swiss watch batteries, pricing, gasket checks, and pressure-testing policy.'),
+    link('About the shop', '/about', 'Shop location, hours, and directions on the Upper East Side.'),
+    link('Book an appointment', '/book', 'Arrange a watch-service visit; walk-ins are also welcome during shop hours.'),
+    '',
+    '## Watch-care guides',
+    link('Watch care guide library', '/guides', 'The authoritative index of published watch-care guides from the shop.'),
+    ...published.map((guide) => link(guide.title, `/guides/${guide.slug}`, guide.excerpt || guide.metaDescription)),
+    '',
+    'This optional index does not grant crawler permissions or replace robots.txt or sitemap.xml.',
+    '',
+  ].join('\n');
+}

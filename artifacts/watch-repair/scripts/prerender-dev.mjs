@@ -1,4 +1,4 @@
-import { renderDocument, renderSitemap, renderRobots, PUBLIC_PATHS, site } from './prerender-document.mjs';
+import { renderDocument, renderSitemap, renderRobots, renderLlms, PUBLIC_PATHS, site } from './prerender-document.mjs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
@@ -11,7 +11,7 @@ export function prerenderDev() {
         server.middlewares.use(async (req, res, next) => {
           const route = new URL(req.url || '/', 'http://preview.local').pathname.replace(/\/$/, '') || '/';
           const isPublic = PUBLIC_PATHS.includes(route) || route.startsWith('/guides/');
-          if (!isPublic && !site.retiredPaths.includes(route) && !['/sitemap.xml', '/robots.txt'].includes(route)) return next();
+          if (!isPublic && !site.retiredPaths.includes(route) && !['/sitemap.xml', '/robots.txt', '/llms.txt'].includes(route)) return next();
           try {
             if (route === '/robots.txt') {
               res.setHeader('Content-Type', 'text/plain');
@@ -19,6 +19,10 @@ export function prerenderDev() {
             }
             const { loadPublishedGuides } = await server.ssrLoadModule('/scripts/load-published-guides.ts');
             const guides = await loadPublishedGuides();
+            if (route === '/llms.txt') {
+              res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+              return res.end(renderLlms(guides));
+            }
             if (route === '/sitemap.xml') {
               res.setHeader('Content-Type', 'application/xml');
               return res.end(renderSitemap([...PUBLIC_PATHS, ...guides.map((guide) => `/guides/${guide.slug}`)]));
